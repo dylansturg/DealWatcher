@@ -1,0 +1,21 @@
+{
+    "environmentSettings": {
+        "webSite": {
+            "name": "DealWatcherService",
+            "location": "North Central US"
+        },
+        "databases": [
+            {
+                "connectionStringName": "DefaultConnection",
+                "databaseName": "DealWatcherService_db",
+                "serverName": "",
+                "user": "dealfinder",
+                "password": "",
+                "edition": "",
+                "size": "",
+                "collation": "",
+                "location": "North Central US"
+            }
+        ]
+    }
+}
