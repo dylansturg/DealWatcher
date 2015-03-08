@@ -13,6 +13,8 @@ using DealWatcher.Models;
 
 namespace DealWatcher.Controllers
 {
+    [Authorize]
+    [RoutePrefix("api/Products")]
     public class ProductsController : ApiController
     {
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
@@ -34,6 +36,19 @@ namespace DealWatcher.Controllers
             }
 
             return Ok(product);
+        }
+
+
+        [Route("ProductCodeTypes")]
+        public async Task<IEnumerable<ProductCodeTypesViewModel>> GetProductCodeTypes()
+        {
+            var availableCodes = await db.ProductCodeTypes.ToListAsync();
+            return availableCodes.Select(code => new ProductCodeTypesViewModel()
+            {
+                Id = code.Id,
+                Type = code.Type,
+                ProprietarySellerId = code.ProprietarySellerId
+            });
         }
 
         // PUT: api/Products/5
