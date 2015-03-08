@@ -284,6 +284,7 @@
     <Compile Include="Models\Product.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ProductBindingModels.cs" />
     <Compile Include="Models\ProductCode.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
@@ -293,7 +294,6 @@
     <Compile Include="Models\ProductImage.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ProductBindingModels.cs" />
     <Compile Include="Models\ProductPrice.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
