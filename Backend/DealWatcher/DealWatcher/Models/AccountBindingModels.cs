@@ -35,6 +35,9 @@ namespace DealWatcher.Models
     public class RegisterBindingModel
     {
         [Required]
+        public string RegistrationToken { get; set; }
+
+        [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
@@ -48,6 +51,20 @@ namespace DealWatcher.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [Display(Name="User Name")]
+        [StringLength(50, ErrorMessage="{0} must not exceed {1} characters.")]
+        public string DisplayName { get; set; }
+
+        [Display(Name = "First Name")]
+        [StringLength(50, ErrorMessage = "{0} must not exceed {1} characters.")]
+        public string FirstName { get; set; }
+
+        [Display(Name = "Last Name")]
+        [StringLength(50, ErrorMessage = "{0} must not exceed {1} characters.")]
+        public string LastName { get; set; }
+
     }
 
     public class RegisterExternalBindingModel

@@ -16,6 +16,8 @@ using Microsoft.Owin.Security.OAuth;
 using DealWatcher.Models;
 using DealWatcher.Providers;
 using DealWatcher.Results;
+using System.Linq;
+using System.Net.Http.Headers;
 
 namespace DealWatcher.Controllers
 {
@@ -25,6 +27,8 @@ namespace DealWatcher.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
+
+        private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
 
         public AccountController()
         {
@@ -328,6 +332,12 @@ namespace DealWatcher.Controllers
                 return BadRequest(ModelState);
             }
 
+            var usedToken = db.RegistrationTokens.FirstOrDefault(token => token.Token == model.RegistrationToken);
+            if (usedToken == null)
+            {
+                return Unauthorized(new List<AuthenticationHeaderValue>());
+            }
+
             var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
@@ -336,6 +346,10 @@ namespace DealWatcher.Controllers
             {
                 return GetErrorResult(result);
             }
+
+            var localUser = new User() { AspNetUserId = user.Id, DisplayName = model.DisplayName, FirstName = model.FirstName, LastName = model.LastName };
+            db.Users.Add(localUser);
+            await db.SaveChangesAsync();
 
             return Ok();
         }
@@ -379,6 +393,11 @@ namespace DealWatcher.Controllers
             {
                 _userManager.Dispose();
                 _userManager = null;
+            }
+
+            if (disposing && db != null)
+            {
+                db.Dispose();
             }
 
             base.Dispose(disposing);

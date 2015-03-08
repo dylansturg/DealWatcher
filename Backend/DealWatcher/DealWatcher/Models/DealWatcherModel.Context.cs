@@ -37,5 +37,6 @@ namespace DealWatcher.Models
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Seller> Sellers { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<RegistrationToken> RegistrationTokens { get; set; }
     }
 }

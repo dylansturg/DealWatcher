@@ -296,6 +296,9 @@
     <Compile Include="Models\ProductPrice.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RegistrationToken.cs">
+      <DependentUpon>DealWatcherModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Seller.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>

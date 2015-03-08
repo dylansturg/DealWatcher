@@ -27,6 +27,7 @@
         <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductImages_0" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_0" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_1" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.RegistrationToken" Width="1.5" PointX="7.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
