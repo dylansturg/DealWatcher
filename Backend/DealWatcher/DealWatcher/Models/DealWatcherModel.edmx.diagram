@@ -10,10 +10,23 @@
         <EntityTypeShape EntityType="DealWatcherService_dbModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="DealWatcherService_dbModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DealWatcherService_dbModel.AspNetUser" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealWatcherService_dbModel.TestTable" Width="1.5" PointX="2.75" PointY="6.75" IsExpanded="true" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="DealWatcherService_dbModel.AspNetUserRoles" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.ProductCode" Width="1.5" PointX="7.625" PointY="10.25" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.ProductCodeType" Width="1.5" PointX="5.375" PointY="13.25" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.ProductImage" Width="1.5" PointX="7.625" PointY="16.625" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.ProductPrice" Width="1.5" PointX="10.625" PointY="9.875" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.Product" Width="1.5" PointX="5.375" PointY="10.25" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.Seller" Width="1.5" PointX="3.125" PointY="13.125" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.User" Width="1.5" PointX="5.25" PointY="6.375" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_Users_0" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductCodes_0" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductCodes_1" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductCodeTypes_0" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductImages_0" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_0" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_1" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

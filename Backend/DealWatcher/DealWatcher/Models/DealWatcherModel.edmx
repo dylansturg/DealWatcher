@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DealWatcherService_dbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DealWatcherService_dbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -66,12 +66,68 @@
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
         </EntityType>
-        <EntityType Name="TestTable">
+        <EntityType Name="ProductCodes">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="TypeId" />
+            <PropertyRef Name="ProductId" />
           </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Words" Type="nvarchar" MaxLength="20" />
+          <Property Name="TypeId" Type="int" Nullable="false" />
+          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProductCodeTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ProprietarySellerId" Type="int" />
+        </EntityType>
+        <EntityType Name="ProductImages">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="Url" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProductPrices">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="SellerId" Type="int" Nullable="false" />
+          <Property Name="Gathered" Type="datetime" Nullable="false" />
+          <Property Name="LocationUrl" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Price" Type="money" Nullable="false" />
+          <Property Name="Current" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Products">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Sellers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Website" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PriceSource" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AspNetUserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
@@ -129,6 +185,92 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProductCodes_0">
+          <End Role="ProductCodeTypes" Type="Self.ProductCodeTypes" Multiplicity="1" />
+          <End Role="ProductCodes" Type="Self.ProductCodes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductCodeTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCodes">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodes_1">
+          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="ProductCodes" Type="Self.ProductCodes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Products">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCodes">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodeTypes_0">
+          <End Role="Sellers" Type="Self.Sellers" Multiplicity="0..1" />
+          <End Role="ProductCodeTypes" Type="Self.ProductCodeTypes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sellers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCodeTypes">
+              <PropertyRef Name="ProprietarySellerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductImages_0">
+          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="ProductImages" Type="Self.ProductImages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Products">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductImages">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductPrices_0">
+          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="ProductPrices" Type="Self.ProductPrices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Products">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductPrices">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductPrices_1">
+          <End Role="Sellers" Type="Self.Sellers" Multiplicity="1" />
+          <End Role="ProductPrices" Type="Self.ProductPrices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sellers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductPrices">
+              <PropertyRef Name="SellerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_0">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="AspNetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="DealWatcherService_dbModelStoreContainer">
           <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
@@ -136,7 +278,13 @@
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="TestTable" EntityType="Self.TestTable" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductCodes" EntityType="Self.ProductCodes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductCodeTypes" EntityType="Self.ProductCodeTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductImages" EntityType="Self.ProductImages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductPrices" EntityType="Self.ProductPrices" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Products" EntityType="Self.Products" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Sellers" EntityType="Self.Sellers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -153,9 +301,36 @@
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_0" Association="Self.FK_ProductCodes_0">
+            <End Role="ProductCodeTypes" EntitySet="ProductCodeTypes" />
+            <End Role="ProductCodes" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_1" Association="Self.FK_ProductCodes_1">
+            <End Role="Products" EntitySet="Products" />
+            <End Role="ProductCodes" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodeTypes_0" Association="Self.FK_ProductCodeTypes_0">
+            <End Role="Sellers" EntitySet="Sellers" />
+            <End Role="ProductCodeTypes" EntitySet="ProductCodeTypes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductImages_0" Association="Self.FK_ProductImages_0">
+            <End Role="Products" EntitySet="Products" />
+            <End Role="ProductImages" EntitySet="ProductImages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductPrices_0" Association="Self.FK_ProductPrices_0">
+            <End Role="Products" EntitySet="Products" />
+            <End Role="ProductPrices" EntitySet="ProductPrices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductPrices_1" Association="Self.FK_ProductPrices_1">
+            <End Role="Sellers" EntitySet="Sellers" />
+            <End Role="ProductPrices" EntitySet="ProductPrices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_0" Association="Self.FK_Users_0">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DealWatcherService_dbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -217,13 +392,7 @@
           <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
           <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
-        </EntityType>
-        <EntityType Name="TestTable">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Words" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Users" Relationship="DealWatcherService_dbModel.FK_Users_0" FromRole="AspNetUser" ToRole="User" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
@@ -263,7 +432,6 @@
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogin" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
-          <EntitySet Name="TestTables" EntityType="Self.TestTable" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -276,7 +444,204 @@
             <End Role="AspNetRoles" EntitySet="AspNetRoles" />
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
           </AssociationSet>
+          <EntitySet Name="ProductCodes" EntityType="DealWatcherService_dbModel.ProductCode" />
+          <EntitySet Name="ProductCodeTypes" EntityType="DealWatcherService_dbModel.ProductCodeType" />
+          <EntitySet Name="ProductImages" EntityType="DealWatcherService_dbModel.ProductImage" />
+          <EntitySet Name="ProductPrices" EntityType="DealWatcherService_dbModel.ProductPrice" />
+          <EntitySet Name="Products" EntityType="DealWatcherService_dbModel.Product" />
+          <EntitySet Name="Sellers" EntityType="DealWatcherService_dbModel.Seller" />
+          <EntitySet Name="Users" EntityType="DealWatcherService_dbModel.User" />
+          <AssociationSet Name="FK_Users_0" Association="DealWatcherService_dbModel.FK_Users_0">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_0" Association="DealWatcherService_dbModel.FK_ProductCodes_0">
+            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_1" Association="DealWatcherService_dbModel.FK_ProductCodes_1">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodeTypes_0" Association="DealWatcherService_dbModel.FK_ProductCodeTypes_0">
+            <End Role="Seller" EntitySet="Sellers" />
+            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductImages_0" Association="DealWatcherService_dbModel.FK_ProductImages_0">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductImage" EntitySet="ProductImages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductPrices_0" Association="DealWatcherService_dbModel.FK_ProductPrices_0">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductPrice" EntitySet="ProductPrices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductPrices_1" Association="DealWatcherService_dbModel.FK_ProductPrices_1">
+            <End Role="Seller" EntitySet="Sellers" />
+            <End Role="ProductPrice" EntitySet="ProductPrices" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="ProductCode">
+          <Key>
+            <PropertyRef Name="TypeId" />
+            <PropertyRef Name="ProductId" />
+          </Key>
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ProductCodeType" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCode" ToRole="ProductCodeType" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="ProductCode" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="ProductCodeType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ProprietarySellerId" Type="Int32" />
+          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCodeType" ToRole="ProductCode" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="ProductCodeType" ToRole="Seller" />
+        </EntityType>
+        <EntityType Name="ProductImage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="Url" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="ProductImage" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="ProductPrice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="SellerId" Type="Int32" Nullable="false" />
+          <Property Name="Gathered" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LocationUrl" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="Current" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="ProductPrice" ToRole="Product" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="ProductPrice" ToRole="Seller" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="Product" ToRole="ProductCode" />
+          <NavigationProperty Name="ProductImages" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="Product" ToRole="ProductImage" />
+          <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="Product" ToRole="ProductPrice" />
+        </EntityType>
+        <EntityType Name="Seller">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Website" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PriceSource" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ProductCodeTypes" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="Seller" ToRole="ProductCodeType" />
+          <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="Seller" ToRole="ProductPrice" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AspNetUserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_Users_0" FromRole="User" ToRole="AspNetUser" />
+        </EntityType>
+        <Association Name="FK_Users_0">
+          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DealWatcherService_dbModel.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="AspNetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodes_0">
+          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductCodeType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCode">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodes_1">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCode">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodeTypes_0">
+          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="0..1" />
+          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Seller">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCodeType">
+              <PropertyRef Name="ProprietarySellerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductImages_0">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductImage" Role="ProductImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductImage">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductPrices_0">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductPrice" Role="ProductPrice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductPrice">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductPrices_1">
+          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductPrice" Role="ProductPrice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Seller">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductPrice">
+              <PropertyRef Name="SellerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -338,14 +703,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="TestTables">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.TestTable">
-              <MappingFragment StoreEntitySet="TestTable">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="Words" ColumnName="Words" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <AssociationSetMapping Name="AspNetUserRoles" TypeName="DealWatcherService_dbModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
             <EndProperty Name="AspNetRoles">
               <ScalarProperty Name="Id" ColumnName="RoleId" />
@@ -354,6 +711,75 @@
               <ScalarProperty Name="Id" ColumnName="UserId" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="ProductCodes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCode">
+              <MappingFragment StoreEntitySet="ProductCodes">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductCodeTypes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCodeType">
+              <MappingFragment StoreEntitySet="ProductCodeTypes">
+                <ScalarProperty Name="ProprietarySellerId" ColumnName="ProprietarySellerId" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductImages">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductImage">
+              <MappingFragment StoreEntitySet="ProductImages">
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductPrices">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductPrice">
+              <MappingFragment StoreEntitySet="ProductPrices">
+                <ScalarProperty Name="Current" ColumnName="Current" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="LocationUrl" ColumnName="LocationUrl" />
+                <ScalarProperty Name="Gathered" ColumnName="Gathered" />
+                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.Product">
+              <MappingFragment StoreEntitySet="Products">
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sellers">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.Seller">
+              <MappingFragment StoreEntitySet="Sellers">
+                <ScalarProperty Name="PriceSource" ColumnName="PriceSource" />
+                <ScalarProperty Name="Website" ColumnName="Website" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.User">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="AspNetUserId" ColumnName="AspNetUserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

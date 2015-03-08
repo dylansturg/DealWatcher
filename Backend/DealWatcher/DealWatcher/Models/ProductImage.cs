@@ -12,9 +12,12 @@ namespace DealWatcher.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class TestTable
+    public partial class ProductImage
     {
-        public int ID { get; set; }
-        public string Words { get; set; }
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public string Url { get; set; }
+    
+        public virtual Product Product { get; set; }
     }
 }

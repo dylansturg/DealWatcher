@@ -30,6 +30,12 @@ namespace DealWatcher.Models
         public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
-        public virtual DbSet<TestTable> TestTables { get; set; }
+        public virtual DbSet<ProductCode> ProductCodes { get; set; }
+        public virtual DbSet<ProductCodeType> ProductCodeTypes { get; set; }
+        public virtual DbSet<ProductImage> ProductImages { get; set; }
+        public virtual DbSet<ProductPrice> ProductPrices { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Seller> Sellers { get; set; }
+        public virtual DbSet<User> Users { get; set; }
     }
 }
