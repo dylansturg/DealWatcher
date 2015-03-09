@@ -17,7 +17,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         }
 
         private const string AmazonCodeType = "ASIN";
-        private const int MaxItemPages = 5;
+        private const int MaxItemPages = 6;
         protected Operation RequestType { get; set; }
         protected int Page = 1;
 
@@ -77,10 +77,13 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                 {
                     var request = GetRequestParameters();
                     var uri = RequestsHelper.Instance.SignRequest(request);
-                    apiTasks.Add(Task.Factory.StartNew(async () =>
+
+                    apiTasks.Add(TaskEx.Run(async () =>
                     {
-                        var responseString = await client.GetStringAsync(uri);
-                        results.Add(new AmazonResponse(responseString));
+                        var apiResponse = await client.GetStringAsync(uri);
+                        var response = new AmazonResponse();
+                        await response.ParseResultsAsync(apiResponse);
+                        results.Add(response);
                     }));
 
                     Page++;
@@ -127,7 +130,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
 
         private void AppendDefaultParams(Dictionary<String, String> request)
         {
-            request.Add("SearchIndex", "All");
+            request.Add("SearchIndex", "Blended");
             request.Add("Availability", "Available");
             request.Add("ResponseGroup", "ItemAttributes,Images,OfferSummary");
             request.Add("ItemPage", Page.ToString());

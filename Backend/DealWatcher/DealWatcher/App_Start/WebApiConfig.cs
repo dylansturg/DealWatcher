@@ -23,6 +23,8 @@ namespace DealWatcher
             );
 
             config.Filters.Add(new RequireHttpsAttribute());
+
+            AutoMapperConfig.Configure();
         }
     }
 }

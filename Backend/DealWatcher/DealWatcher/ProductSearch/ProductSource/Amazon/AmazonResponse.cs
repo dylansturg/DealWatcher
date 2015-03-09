@@ -2,20 +2,118 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DealWatcher.Models;
+using DealWatcher.Models.Amazon;
+using System.Xml.Serialization;
+using System.IO;
+using System.Text;
+using System.Linq;
+using System.Xml;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
     public class AmazonResponse
     {
-        private string _data;
-        public AmazonResponse(String responseString)
+        public IEnumerable<AmazonProduct> ParsedResults { get; private set; }
+
+        public AmazonResponse()
         {
-            _data = responseString;
         }
 
-        public async Task<IEnumerable<AmazonProduct>> GetResponseResultsAsync()
+        public async Task ParseResultsAsync(String xmlSource)
         {
-            return null;
+
+            List<Item> items = null;
+            var serializer = new XmlSerializer(typeof(ItemSearchResponse));
+            using (var xmlStream = StringStream(xmlSource))
+            {
+                try
+                {
+                    var parsed = serializer.Deserialize(xmlStream) as ItemSearchResponse;
+                    items = parsed != null ? (parsed.Items != null ? parsed.Items.Item : null) : null;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
+            if (items == null)
+            {
+                ParsedResults = new List<AmazonProduct>();
+                return;
+            }
+
+            var amazonProds = items.Select<Item, AmazonProduct>(item =>
+            {
+                try
+                {
+                    return new AmazonProduct
+                    {
+                        ASIN = item.ASIN != null ? item.ASIN.Value : "",
+                        DetailsUrl = item.DetailPageURL != null ? item.DetailPageURL.Value : "",
+                        EANs = item.ItemAttributes.EANList != null ? new HashSet<string>(item.ItemAttributes.EANList.EANListElement.Select(el => el.Value)) : new HashSet<string>(),
+                        UPCs = item.ItemAttributes.UPCList != null ? new HashSet<string>(item.ItemAttributes.UPCList.UPCListElement.Select(el => el.Value)) : new HashSet<string>(),
+                        Title = item.ItemAttributes.Title.Value,
+                        ImageUrls = SelectItemImage(item),
+                        Price = SelectItemPrice(item),
+                    };
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }).Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
+
+            ParsedResults = amazonProds;
+        }
+
+        private double SelectItemPrice(Item item)
+        {
+            if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null)
+            {
+                return ParsePriceAmount(item.OfferSummary.LowestNewPrice.ListPriceAmount.Value.ToString());
+            }
+            else if (item.ItemAttributes != null && item.ItemAttributes.ListPrice != null)
+            {
+                return ParsePriceAmount(item.ItemAttributes.ListPrice.ListPriceAmount.Value.ToString());
+            }
+
+            return -1;
+        }
+
+        private static double ParsePriceAmount(string lowPrice)
+        {
+            if (lowPrice.Length <= 2)
+            {
+                return Double.Parse(String.Format("0.{0}", lowPrice));
+            }
+
+            var decimals = lowPrice.Substring(lowPrice.Length - 2, 2);
+            var digits = lowPrice.Substring(0, lowPrice.Length - 2);
+            return Double.Parse(String.Format("{0}.{1}", digits, decimals));
+        }
+
+        private HashSet<string> SelectItemImage(Item item)
+        {
+            var result = new HashSet<String>();
+            if (item.ItemLargeImage != null && item.ItemLargeImage.ItemImageURL != null)
+            {
+                result.Add(item.ItemLargeImage.ItemImageURL.Value);
+            }
+            else if (item.ItemMediumImage != null && item.ItemMediumImage.ItemImageURL != null)
+            {
+                result.Add(item.ItemMediumImage.ItemImageURL.Value);
+            }
+            else if (item.ItemSmallImage != null && item.ItemSmallImage.ItemImageURL != null)
+            {
+                result.Add(item.ItemSmallImage.ItemImageURL.Value);
+            }
+            return result;
+        }
+
+        private Stream StringStream(String s)
+        {
+            return new MemoryStream(Encoding.UTF8.GetBytes(s ?? ""));
         }
     }
 }

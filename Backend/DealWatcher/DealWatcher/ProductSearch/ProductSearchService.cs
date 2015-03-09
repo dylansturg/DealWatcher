@@ -27,7 +27,7 @@ namespace DealWatcher.ProductSearch
             };
 
             var searchResults = new ConcurrentBag<Product>();
-            var searchTasks = ProductSources.Select<IProductSource, Task>(productSource => Task.Factory.StartNew(async () =>
+            var searchTasks = ProductSources.Select<IProductSource, Task>(productSource => TaskEx.Run(async () =>
             {
                 var products = await productSource.SearchAsync(entities, searchModel); 
                 products.ForEach(prod => searchResults.Add(prod));

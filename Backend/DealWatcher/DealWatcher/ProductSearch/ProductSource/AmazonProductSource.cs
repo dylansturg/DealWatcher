@@ -13,6 +13,7 @@ namespace DealWatcher.ProductSearch.ProductSource
     {
         public const string AmazonCodeType = "ASIN";
         public const string AmazonSellerName = "Amazon";
+        public const int DisplayNameLength = 100;
 
         public async Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search)
         {
@@ -21,7 +22,7 @@ namespace DealWatcher.ProductSearch.ProductSource
             var amazonSearchResults = new List<AmazonProduct>();
             foreach (var response in searchResponses)
             {
-                var amazonProducts = await response.GetResponseResultsAsync();
+                var amazonProducts = response.ParsedResults;
                 amazonSearchResults.AddRange(amazonProducts);
             }
 
@@ -46,8 +47,9 @@ namespace DealWatcher.ProductSearch.ProductSource
                 }
 
                 var product = sortedProducts[amazonProduct.ASIN];
+                
                 UpdateProductCodes(db, product, amazonProduct);
-                AppendFoundPrice(amazonProduct, product);
+                AppendFoundPrice(amazonProduct, product, amazonSeller);
                 UpdateProductImages(product, amazonProduct);
 
                 db.UpdateGraph(product,
@@ -55,6 +57,7 @@ namespace DealWatcher.ProductSearch.ProductSource
                         map.OwnedCollection(p => p.ProductCodes)
                             .OwnedCollection(p => p.ProductImages)
                             .OwnedCollection(p => p.ProductPrices));
+                db.SaveChanges();
             }
 
             return sortedProducts.Values.ToList();
@@ -77,7 +80,7 @@ namespace DealWatcher.ProductSearch.ProductSource
             }
         }
 
-        private static void AppendFoundPrice(AmazonProduct amazonProduct, Product product)
+        private static void AppendFoundPrice(AmazonProduct amazonProduct, Product product, Seller seller)
         {
             var foundPrice = new ProductPrice()
             {
@@ -87,6 +90,8 @@ namespace DealWatcher.ProductSearch.ProductSource
                 Price = (Decimal) amazonProduct.Price,
                 Product = product,
                 ProductId = product.Id,
+                Seller = seller,
+                SellerId = seller.Id
             };
             product.ProductPrices.Add(foundPrice);
         }
@@ -137,7 +142,7 @@ namespace DealWatcher.ProductSearch.ProductSource
             }
 
             var existingProduct =
-                db.ProductCodes.Where(
+                db.ProductCodes.AsNoTracking().Where(
                     code => code.Code == amazonProduct.ASIN && code.ProductCodeType.Id == amazonsCode.Id)
                     .Select(code => code.Product);
             if (existingProduct.Any())
@@ -147,7 +152,8 @@ namespace DealWatcher.ProductSearch.ProductSource
 
             var product = new Product()
             {
-                DisplayName = amazonProduct.Title,
+                DisplayName = amazonProduct.Title.Length <= DisplayNameLength ? 
+                    amazonProduct.Title : amazonProduct.Title.Substring(0, DisplayNameLength - 3) + "...",
             };
             return product;
         }
