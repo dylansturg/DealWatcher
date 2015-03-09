@@ -3,7 +3,7 @@ using System.Web.Http;
 
 namespace DealWatcher.Controllers
 {
-    [Authorize]
+    
     public class ValuesController : ApiController
     {
         // GET api/values
