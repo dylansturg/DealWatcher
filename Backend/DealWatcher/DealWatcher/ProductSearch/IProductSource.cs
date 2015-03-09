@@ -7,6 +7,5 @@ namespace DealWatcher.ProductSearch
     public interface IProductSource
     {
         Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search);
-        Task<IEnumerable<ProductPrice>> SearchProductPricesAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search);
     }
 }

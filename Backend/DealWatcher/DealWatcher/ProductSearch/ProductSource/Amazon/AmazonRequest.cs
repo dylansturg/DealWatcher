@@ -49,7 +49,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             }
             else
             {
-                SetupNameSearch(search.ProductName);
+                SetupNameSearch(search.Keywords);
             }
         }
 

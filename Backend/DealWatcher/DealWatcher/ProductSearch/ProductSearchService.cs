@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using DealWatcher.Models;
 using DealWatcher.ProductSearch.ProductSource;
 using WebGrease.Css.Extensions;
@@ -17,14 +18,10 @@ namespace DealWatcher.ProductSearch
         
         public async static Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities entities, ProductSearchBindingModel search)
         {
-            var searchModel = new ProductSearchViewModel()
-            {
-                Keywords = search.Keywords,
-                ProductName = search.ProductName,
-                ProductCode = search.ProductCode,
-                ProductCodeTypeId = search.ProductCodeTypeId,
-                ProductCodeType = search.ProductCodeTypeId != null ? entities.ProductCodeTypes.Find(search.ProductCodeTypeId).Type : null
-            };
+            var searchModel = Mapper.Map(search, new ProductSearchViewModel());
+            searchModel.ProductCodeType = search.ProductCodeTypeId != null
+                ? entities.ProductCodeTypes.Find(search.ProductCodeTypeId).Type
+                : null;
 
             var searchResults = new ConcurrentBag<Product>();
             var searchTasks = ProductSources.Select<IProductSource, Task>(productSource => TaskEx.Run(async () =>

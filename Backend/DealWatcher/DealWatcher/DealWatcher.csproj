@@ -254,6 +254,7 @@
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\ProductSearchController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Filters\RequiredWhenOtherPresentAttribute.cs" />
     <Compile Include="Filters\RequireHttpsAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

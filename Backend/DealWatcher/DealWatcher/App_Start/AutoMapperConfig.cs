@@ -26,7 +26,9 @@ namespace DealWatcher
             Mapper.CreateMap<IList<ProductPrice>, IList<ProductPriceViewModel>>();
             Mapper.CreateMap<IList<ProductImage>, IList<ProductImageViewModel>>();
             Mapper.CreateMap<IList<ProductCode>, IList<ProductCodeViewModel>>();
-            
+
+            Mapper.CreateMap<ProductSearchBindingModel, ProductSearchViewModel>();
+
         }
     }
 }

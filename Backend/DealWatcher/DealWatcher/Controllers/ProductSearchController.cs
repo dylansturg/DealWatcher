@@ -14,6 +14,7 @@ using System.Text;
 
 namespace DealWatcher.Controllers
 {
+    [Authorize]
     public class ProductSearchController : ApiController
     {
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
@@ -25,7 +26,6 @@ namespace DealWatcher.Controllers
                 var searchResults = await ProductSearchService.SearchAsync(db, new ProductSearchBindingModel()
                 {
                     Keywords = "iPad",
-                    ProductName = "iPad Air 2",
                 });
                 return Mapper.Map(searchResults, new List<ProductViewModel>());
             }
@@ -47,25 +47,11 @@ namespace DealWatcher.Controllers
             return null;
         }
 
-        // GET: api/ProductSearch/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST: api/ProductSearch
-        public void Post([FromBody]string value)
+        public async Task<IEnumerable<Product>> Post(ProductSearchBindingModel value)
         {
-        }
 
-        // PUT: api/ProductSearch/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/ProductSearch/5
-        public void Delete(int id)
-        {
+            return null;
         }
 
         protected override void Dispose(bool disposing)

@@ -29,11 +29,6 @@ namespace DealWatcher.ProductSearch.ProductSource
             return CombineAmazonProducts(db, amazonSearchResults);
         }
 
-        public async Task<IEnumerable<ProductPrice>> SearchProductPricesAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search)
-        {
-            throw new NotImplementedException();
-        }
-
         private IEnumerable<Product> CombineAmazonProducts(DealWatcherService_dbEntities db, IEnumerable<AmazonProduct> products)
         {
             var sortedProducts = new Dictionary<String, Product>();
