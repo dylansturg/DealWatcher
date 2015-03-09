@@ -20,7 +20,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         private byte[] SecretKeyBytes;
 
         private static RequestsHelper _instance = null;
-        private static RequestsHelper Instance
+        public static RequestsHelper Instance
         {
             get
             {
@@ -32,7 +32,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             }
         }
 
-        public RequestsHelper()
+        private RequestsHelper()
         {
             SecretKeyBytes = System.Text.Encoding.UTF8.GetBytes(awsSecretKey);
         }
