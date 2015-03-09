@@ -1,11 +1,10 @@
-﻿using DealWatcher.Models;
-using DealWatcher.ProductSearch.ProductSource;
-using System;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using RefactorThis.GraphDiff;
+using DealWatcher.Models;
+using DealWatcher.ProductSearch.ProductSource;
+using WebGrease.Css.Extensions;
 
 namespace DealWatcher.ProductSearch
 {
@@ -13,21 +12,33 @@ namespace DealWatcher.ProductSearch
     {
         protected static IEnumerable<IProductSource> ProductSources = new List<IProductSource>()
         {
-            new AmazonProductSource(),
+            new AmazonProductSource()
         };
         
-        public async static Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities Entities, ProductSearchBindingModel Search)
+        public async static Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities entities, ProductSearchBindingModel search)
         {
-            var searchResults = new List<Product>();
-            foreach (var productSource in ProductSources)
+            var searchModel = new ProductSearchViewModel()
             {
-                var products = await productSource.SearchAsync(Search);
-            }
+                Keywords = search.Keywords,
+                ProductName = search.ProductName,
+                ProductCode = search.ProductCode,
+                ProductCodeTypeId = search.ProductCodeTypeId,
+                ProductCodeType = search.ProductCodeTypeId != null ? entities.ProductCodeTypes.Find(search.ProductCodeTypeId).Type : null
+            };
+
+            var searchResults = new ConcurrentBag<Product>();
+            var searchTasks = ProductSources.Select<IProductSource, Task>(productSource => Task.Factory.StartNew(async () =>
+            {
+                var products = await productSource.SearchAsync(entities, searchModel); 
+                products.ForEach(prod => searchResults.Add(prod));
+            })).ToList();
+
+            await Task.WhenAll(searchTasks);
 
             return searchResults;
         }
 
-        public async static Task<IEnumerable<ProductPrice>> SearchProductPricesAsync(DealWatcherService_dbEntities Entities, Product Search)
+        public async static Task<IEnumerable<ProductPrice>> SearchProductPricesAsync(DealWatcherService_dbEntities entities, Product search)
         {
             return null;
         }

@@ -1,9 +1,7 @@
-﻿using DealWatcher.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DealWatcher.Models;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
@@ -15,7 +13,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             _data = responseString;
         }
 
-        public async Task<IEnumerable<AmazonProduct>> GetResponseResults()
+        public async Task<IEnumerable<AmazonProduct>> GetResponseResultsAsync()
         {
             return null;
         }

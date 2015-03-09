@@ -11,11 +11,7 @@
 
 namespace DealWatcher.Models
 {
-
-using System;
-    using System.Collections.Generic;
-    
-public partial class User
+    public partial class User
 {
 
     public int Id { get; set; }

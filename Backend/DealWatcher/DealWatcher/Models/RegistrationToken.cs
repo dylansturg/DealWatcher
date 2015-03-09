@@ -11,11 +11,7 @@
 
 namespace DealWatcher.Models
 {
-
-using System;
-    using System.Collections.Generic;
-    
-public partial class RegistrationToken
+    public partial class RegistrationToken
 {
 
     public int Id { get; set; }

@@ -10,15 +10,12 @@
 //------------------------------------------------------------------------------
 
 
-namespace DealWatcher.Models
-{
-
-using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 
-
-public partial class DealWatcherService_dbEntities : DbContext
+namespace DealWatcher.Models
+{
+    public partial class DealWatcherService_dbEntities : DbContext
 {
     public DealWatcherService_dbEntities()
         : base("name=DealWatcherService_dbEntities")

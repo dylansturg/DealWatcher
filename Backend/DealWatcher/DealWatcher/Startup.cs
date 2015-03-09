@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using DealWatcher;
 using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartup(typeof(DealWatcher.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 
 namespace DealWatcher
 {

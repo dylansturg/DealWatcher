@@ -11,11 +11,7 @@
 
 namespace DealWatcher.Models
 {
-
-using System;
-    using System.Collections.Generic;
-    
-public partial class C__MigrationHistory
+    public partial class C__MigrationHistory
 {
 
     public string MigrationId { get; set; }

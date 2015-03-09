@@ -1,24 +1,25 @@
-﻿using DealWatcher.Models;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using DealWatcher.Models;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    private enum Operation
-    {
-        ItemLookup,
-        ItemSearch,
-    }
-
     public class AmazonRequest
     {
-        private const int MAX_ITEM_PAGES = 10;
+        protected enum Operation
+        {
+            ItemLookup,
+            ItemSearch,
+        }
+
+        private const string AmazonCodeType = "ASIN";
+        private const int MaxItemPages = 5;
         protected Operation RequestType { get; set; }
-        protected int Page { get; set; }
+        protected int Page = 1;
 
         protected String ProductCode { get; set; }
         protected String ProductCodeType { get; set; }
@@ -26,35 +27,68 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
 
         public AmazonRequest(Product search)
         {
-            Page = 0;
+            var savedProductCode = search.ProductCodes.FirstOrDefault(code => code.ProductCodeType.Type.Equals(AmazonCodeType, StringComparison.CurrentCultureIgnoreCase));
+            if (savedProductCode == null)
+            {
+                savedProductCode = search.ProductCodes.FirstOrDefault();
+                if (savedProductCode == null)
+                {
+                    SetupNameSearch(search.DisplayName);
+                    return;
+                }
+            }
+
+            SetupItemLookup(savedProductCode.Code, savedProductCode.ProductCodeType.Type);
         }
 
-        public AmazonRequest(ProductSearchBindingModel search)
+        public AmazonRequest(ProductSearchViewModel search)
         {
-            Page = 0;
+            if (!String.IsNullOrEmpty(search.ProductCode) && !String.IsNullOrEmpty(search.ProductCodeType))
+            {
+                SetupItemLookup(search.ProductCode, search.ProductCodeType);
+            }
+            else
+            {
+                SetupNameSearch(search.ProductName);
+            }
+        }
+
+        private void SetupNameSearch(String searchTerms)
+        {
+            RequestType = Operation.ItemSearch;
+            ProductName = searchTerms;
+        }
+
+        private void SetupItemLookup(String productCode, String codeType)
+        {
+            RequestType = Operation.ItemLookup;
+            ProductCode = productCode;
+            ProductCodeType = codeType;
         }
 
         public async Task<IEnumerable<AmazonResponse>> ExecuteAsync()
         {
-            var results = new List<AmazonResponse>();
-            var apiTasks = new List<Task>();
+            var results = new ConcurrentBag<AmazonResponse>();
+            
             using (var client = new HttpClient())
             {
-                for (int i = Page; i < MAX_ITEM_PAGES; i++)
+                var apiTasks = new List<Task>();
+                for (var i = Page; i < MaxItemPages; i++)
                 {
                     var request = GetRequestParameters();
                     var uri = RequestsHelper.Instance.SignRequest(request);
-                    var downloadTask = Task.Factory.StartNew(async () =>
+                    apiTasks.Add(Task.Factory.StartNew(async () =>
                     {
                         var responseString = await client.GetStringAsync(uri);
                         results.Add(new AmazonResponse(responseString));
-                    });
-                    
+                    }));
+
                     Page++;
                 }
+                await Task.WhenAll(apiTasks);
             }
-            await Task.WhenAll(apiTasks);
-            return results;
+            
+            return results.ToList();
         }
 
         private Dictionary<String, String> GetRequestParameters()

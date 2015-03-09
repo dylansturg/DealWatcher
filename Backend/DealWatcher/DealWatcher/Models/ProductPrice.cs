@@ -9,13 +9,11 @@
 //------------------------------------------------------------------------------
 
 
+using System;
+
 namespace DealWatcher.Models
 {
-
-using System;
-    using System.Collections.Generic;
-    
-public partial class ProductPrice
+    public partial class ProductPrice
 {
 
     public int Id { get; set; }
@@ -24,7 +22,7 @@ public partial class ProductPrice
 
     public int SellerId { get; set; }
 
-    public System.DateTime Gathered { get; set; }
+    public DateTime Gathered { get; set; }
 
     public string LocationUrl { get; set; }
 

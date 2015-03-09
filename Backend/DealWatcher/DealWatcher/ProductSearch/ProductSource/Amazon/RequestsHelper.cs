@@ -1,96 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using System.Web;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    protected class RequestsHelper
+    class RequestsHelper
     {
-        private const String REQUEST_URI = "/onca/xml";
-        private const String REQUEST_METHOD = "GET";
+        private const String RequestUri = "/onca/xml";
+        private const String RequestMethod = "GET";
 
-        private String endpoint = "webservices.amazon.com"; // must be lowercase
-        private String awsAccessKeyId = "AKIAJ23Q6IDLNLX3IKFQ";
-        private String awsSecretKey = "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";
-        private String associatesId = "httpdylangith-20";
+        private const String Endpoint = "webservices.amazon.com"; // must be lowercase
+        private const String AwsAccessKeyId = "AKIAJ23Q6IDLNLX3IKFQ";
+        private const String AwsSecretKey = "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";
+        private const String AssociatesId = "httpdylangith-20";
 
-        private byte[] SecretKeyBytes;
+        private readonly byte[] _secretKeyBytes;
 
-        private static RequestsHelper _instance = null;
+        private static RequestsHelper _instance;
         public static RequestsHelper Instance
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new RequestsHelper();
-                }
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new RequestsHelper()); }
         }
 
-        private RequestsHelper()
+        public RequestsHelper()
         {
-            SecretKeyBytes = System.Text.Encoding.UTF8.GetBytes(awsSecretKey);
+            _secretKeyBytes = Encoding.UTF8.GetBytes(AwsSecretKey);
         }
 
         public String SignRequest(Dictionary<String, String> requestParams)
         {
-            requestParams.Add("AWSAccessKeyId", awsAccessKeyId);
-            requestParams.Add("Timestamp", timestamp());
-            requestParams.Add("AssociateTag", associatesId);
+            requestParams.Add("AWSAccessKeyId", AwsAccessKeyId);
+            requestParams.Add("Timestamp", Timestamp());
+            requestParams.Add("AssociateTag", AssociatesId);
 
-            SortedDictionary<String, String> sortedParamMap = new SortedDictionary<String, String>(
-                    requestParams);
-            String canonicalQS = canonicalize(sortedParamMap);
-            String toSign = REQUEST_METHOD + "\n" + endpoint + "\n" + REQUEST_URI
-                    + "\n" + canonicalQS;
+            var sortedParamMap = new SortedDictionary<String, String>(
+                    requestParams, new ByteSorter());
+            var canonicalQs = Canonicalize(sortedParamMap);
+            var toSign = RequestMethod + "\n" + Endpoint + "\n" + RequestUri
+                    + "\n" + canonicalQs;
 
-            String hmac = HMACSign(toSign);
-            String sig = percentEncodeRfc3986(hmac);
-            String url = "http://" + endpoint + REQUEST_URI + "?" + canonicalQS
+            var hmac = HmacSign(toSign);
+            var sig = PercentEncodeRfc3986(hmac);
+            var url = "http://" + Endpoint + RequestUri + "?" + canonicalQs
                     + "&Signature=" + sig;
 
             return url;
         }
 
-        private String HMACSign(String stringToSign)
+        private String HmacSign(String stringToSign)
         {
-            String signature = null;
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(stringToSign);
+            String signature;
+            var data = Encoding.UTF8.GetBytes(stringToSign);
 
-            using (var hmac = new HMACSHA256(SecretKeyBytes))
+            using (var hmac = new HMACSHA256(_secretKeyBytes))
             {
-                byte[] signedBytes = hmac.ComputeHash(data);
+                var signedBytes = hmac.ComputeHash(data);
                 signature = Convert.ToBase64String(signedBytes);
             }
             return signature;
         }
 
-        private String timestamp()
+        private static String Timestamp()
         {
-            String timestamp = null;
-            DateTime now = DateTime.UtcNow;
-            timestamp = now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            var now = DateTime.UtcNow;
+            now = now.Subtract(TimeSpan.FromMilliseconds(now.Millisecond));
+            var timestamp = now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             return timestamp;
         }
 
-        private String canonicalize(SortedDictionary<String, String> sortedParamMap)
+        private String Canonicalize(SortedDictionary<String, String> sortedParamMap)
         {
             if (sortedParamMap.Count == 0)
             {
                 return "";
             }
 
-            StringBuilder buffer = new StringBuilder();
+            var buffer = new StringBuilder();
             foreach (var requestParam in sortedParamMap)
             {
-                buffer.Append(percentEncodeRfc3986(requestParam.Key));
+                buffer.Append(PercentEncodeRfc3986(requestParam.Key));
                 buffer.Append("=");
-                buffer.Append(percentEncodeRfc3986(requestParam.Value));
+                buffer.Append(PercentEncodeRfc3986(requestParam.Value));
                 buffer.Append("&");
             }
             buffer.Remove(buffer.Length - 1, 1);
@@ -98,10 +90,18 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             return buffer.ToString();
         }
 
-        private String percentEncodeRfc3986(String s)
+        private String PercentEncodeRfc3986(String s)
         {
-            String result = Uri.EscapeUriString(s);
-            return result.ToUpper();
+            var result = Uri.EscapeDataString(s);
+            return result;
+        }
+
+        protected class ByteSorter : IComparer<String>
+        {
+            public int Compare(string x, string y)
+            {
+                return String.CompareOrdinal(x, y);
+            }
         }
     }
 }
