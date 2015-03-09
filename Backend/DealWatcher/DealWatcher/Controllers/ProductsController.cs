@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using AutoMapper;
 using DealWatcher.Models;
 
 namespace DealWatcher.Controllers
@@ -17,9 +18,9 @@ namespace DealWatcher.Controllers
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
 
         // GET: api/Products
-        public IQueryable<Product> GetProducts()
+        public async Task<IEnumerable<ProductViewModel>> GetProducts()
         {
-            return db.Products;
+            return Mapper.Map(await db.Products.ToListAsync(), new List<ProductViewModel>());
         }
 
         // GET: api/Products/5

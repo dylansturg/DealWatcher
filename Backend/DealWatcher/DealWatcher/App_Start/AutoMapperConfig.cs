@@ -20,7 +20,8 @@ namespace DealWatcher
             Mapper.CreateMap<Product, ProductViewModel>();
             Mapper.CreateMap<ProductPrice, ProductPriceViewModel>();
             Mapper.CreateMap<ProductImage, ProductImageViewModel>();
-            Mapper.CreateMap<ProductCode, ProductCodeViewModel>();
+            Mapper.CreateMap<ProductCode, ProductCodeViewModel>()
+                .ForMember(vm => vm.Type, m => m.MapFrom(model => model.ProductCodeType.Type));
 
             Mapper.CreateMap<IList<Product>, IList<ProductViewModel>>();
             Mapper.CreateMap<IList<ProductPrice>, IList<ProductPriceViewModel>>();
