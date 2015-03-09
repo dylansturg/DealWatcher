@@ -15,7 +15,7 @@ namespace DealWatcher.ProductSearch
         {
             new AmazonProductSource(),
         };
-
+        
         public async static Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities Entities, ProductSearchBindingModel Search)
         {
             var searchResults = new List<Product>();
