@@ -14,21 +14,36 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
     public class AmazonResponse
     {
         public IEnumerable<AmazonProduct> ParsedResults { get; private set; }
+        private AmazonRequest.Operation RequestType { get; set; }
 
-        public AmazonResponse()
+        public AmazonResponse(AmazonRequest.Operation requestType)
         {
+            RequestType = requestType;
+        }
+
+        private XmlSerializer CreateSerializer()
+        {
+            switch (RequestType)
+            {
+                case AmazonRequest.Operation.ItemLookup:
+                    return new XmlSerializer(typeof(ItemLookupResponse));
+                case AmazonRequest.Operation.ItemSearch:
+                    return new XmlSerializer(typeof(ItemSearchResponse));
+                default:
+                    // Probably shouldn't let this happen, who knows what that's going to do
+                    return new XmlSerializer(typeof(void));
+            }
         }
 
         public async Task ParseResultsAsync(String xmlSource)
         {
-
             List<Item> items = null;
-            var serializer = new XmlSerializer(typeof(ItemSearchResponse));
+            var serializer = CreateSerializer();
             using (var xmlStream = StringStream(xmlSource))
             {
                 try
                 {
-                    var parsed = serializer.Deserialize(xmlStream) as ItemSearchResponse;
+                    var parsed = serializer.Deserialize(xmlStream) as IAmazonResult;
                     items = parsed != null ? (parsed.Items != null ? parsed.Items.Item : null) : null;
                 }
                 catch (Exception e)
@@ -43,7 +58,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                 return;
             }
 
-            var amazonProds = items.Select<Item, AmazonProduct>(item =>
+            var amazonProds = items.Select(item =>
             {
                 try
                 {

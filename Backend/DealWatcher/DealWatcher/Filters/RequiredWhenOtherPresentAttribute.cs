@@ -25,7 +25,7 @@ namespace DealWatcher.Filters
             if (ValuePresentPredicate != null && ValuePresentPredicate(value))
             {
                 var partnerProperty = validationContext.ObjectType.GetProperty(PartnerProperty);
-                var partnerPropertyVal = partnerProperty.GetValue(validationContext.ObjectType);
+                var partnerPropertyVal = partnerProperty.GetValue(validationContext.ObjectInstance);
                 result = ValuePresentPredicate(partnerPropertyVal);
             }
 

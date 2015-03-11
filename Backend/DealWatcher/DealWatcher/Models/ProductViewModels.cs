@@ -41,7 +41,7 @@ namespace DealWatcher.Models
         public int Id { get; set; }
         public int ProductId { get; set; }
         public int SellerId { get; set; }
-        public DateTime Gathered { get; set; }
+        public DateTimeOffset Gathered { get; set; }
         public string LocationUrl { get; set; }
         public decimal Price { get; set; }
         public bool Current { get; set; }

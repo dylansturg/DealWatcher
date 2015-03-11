@@ -66,14 +66,21 @@
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
         </EntityType>
+        <EntityType Name="PriceCacheDurations">
+          <Key>
+            <PropertyRef Name="SellerId" />
+          </Key>
+          <Property Name="SellerId" Type="int" Nullable="false" />
+          <Property Name="CacheLifetime" Type="time" Precision="7" Nullable="false" />
+        </EntityType>
         <EntityType Name="ProductCodes">
           <Key>
-            <PropertyRef Name="TypeId" />
-            <PropertyRef Name="ProductId" />
+            <PropertyRef Name="Id" />
           </Key>
           <Property Name="TypeId" Type="int" Nullable="false" />
           <Property Name="ProductId" Type="int" Nullable="false" />
           <Property Name="Code" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="ProductCodeTypes">
           <Key>
@@ -98,7 +105,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ProductId" Type="int" Nullable="false" />
           <Property Name="SellerId" Type="int" Nullable="false" />
-          <Property Name="Gathered" Type="datetime" Nullable="false" />
+          <Property Name="Gathered" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="LocationUrl" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Price" Type="money" Nullable="false" />
           <Property Name="Current" Type="bit" Nullable="false" />
@@ -191,6 +198,18 @@
             </Principal>
             <Dependent Role="AspNetUserRoles">
               <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PriceCacheDurations_0">
+          <End Role="Sellers" Type="Self.Sellers" Multiplicity="1" />
+          <End Role="PriceCacheDurations" Type="Self.PriceCacheDurations" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Sellers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PriceCacheDurations">
+              <PropertyRef Name="SellerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -287,6 +306,7 @@
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PriceCacheDurations" EntityType="Self.PriceCacheDurations" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductCodes" EntityType="Self.ProductCodes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductCodeTypes" EntityType="Self.ProductCodeTypes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductImages" EntityType="Self.ProductImages" Schema="dbo" store:Type="Tables" />
@@ -310,6 +330,10 @@
           <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PriceCacheDurations_0" Association="Self.FK_PriceCacheDurations_0">
+            <End Role="Sellers" EntitySet="Sellers" />
+            <End Role="PriceCacheDurations" EntitySet="PriceCacheDurations" />
           </AssociationSet>
           <AssociationSet Name="FK_ProductCodes_0" Association="Self.FK_ProductCodes_0">
             <End Role="ProductCodeTypes" EntitySet="ProductCodeTypes" />
@@ -350,10 +374,8 @@
           <EntitySet Name="AspNetUserClaims" EntityType="DealWatcherService_dbModel.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="DealWatcherService_dbModel.AspNetUserLogin" />
           <EntitySet Name="AspNetUsers" EntityType="DealWatcherService_dbModel.AspNetUser" />
-          <EntitySet Name="ProductCodes" EntityType="DealWatcherService_dbModel.ProductCode" />
           <EntitySet Name="ProductCodeTypes" EntityType="DealWatcherService_dbModel.ProductCodeType" />
           <EntitySet Name="ProductImages" EntityType="DealWatcherService_dbModel.ProductImage" />
-          <EntitySet Name="ProductPrices" EntityType="DealWatcherService_dbModel.ProductPrice" />
           <EntitySet Name="Products" EntityType="DealWatcherService_dbModel.Product" />
           <EntitySet Name="RegistrationTokens" EntityType="DealWatcherService_dbModel.RegistrationToken" />
           <EntitySet Name="Sellers" EntityType="DealWatcherService_dbModel.Seller" />
@@ -370,14 +392,6 @@
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="User" EntitySet="Users" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProductCodes_0" Association="DealWatcherService_dbModel.FK_ProductCodes_0">
-            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
-            <End Role="ProductCode" EntitySet="ProductCodes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProductCodes_1" Association="DealWatcherService_dbModel.FK_ProductCodes_1">
-            <End Role="Product" EntitySet="Products" />
-            <End Role="ProductCode" EntitySet="ProductCodes" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProductCodeTypes_0" Association="DealWatcherService_dbModel.FK_ProductCodeTypes_0">
             <End Role="Seller" EntitySet="Sellers" />
             <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
@@ -386,6 +400,25 @@
             <End Role="Product" EntitySet="Products" />
             <End Role="ProductImage" EntitySet="ProductImages" />
           </AssociationSet>
+          <AssociationSet Name="AspNetUserRoles" Association="DealWatcherService_dbModel.AspNetUserRoles">
+            <End Role="AspNetRole" EntitySet="AspNetRoles" />
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+          </AssociationSet>
+          <EntitySet Name="ProductCodes" EntityType="DealWatcherService_dbModel.ProductCode" />
+          <AssociationSet Name="FK_ProductCodes_0" Association="DealWatcherService_dbModel.FK_ProductCodes_0">
+            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_1" Association="DealWatcherService_dbModel.FK_ProductCodes_1">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <EntitySet Name="PriceCacheDurations" EntityType="DealWatcherService_dbModel.PriceCacheDuration" />
+          <AssociationSet Name="FK_PriceCacheDurations_0" Association="DealWatcherService_dbModel.FK_PriceCacheDurations_0">
+            <End Role="Seller" EntitySet="Sellers" />
+            <End Role="PriceCacheDuration" EntitySet="PriceCacheDurations" />
+          </AssociationSet>
+          <EntitySet Name="ProductPrices" EntityType="DealWatcherService_dbModel.ProductPrice" />
           <AssociationSet Name="FK_ProductPrices_0" Association="DealWatcherService_dbModel.FK_ProductPrices_0">
             <End Role="Product" EntitySet="Products" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
@@ -393,10 +426,6 @@
           <AssociationSet Name="FK_ProductPrices_1" Association="DealWatcherService_dbModel.FK_ProductPrices_1">
             <End Role="Seller" EntitySet="Sellers" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
-          </AssociationSet>
-          <AssociationSet Name="AspNetUserRoles" Association="DealWatcherService_dbModel.AspNetUserRoles">
-            <End Role="AspNetRole" EntitySet="AspNetRoles" />
-            <End Role="AspNetUser" EntitySet="AspNetUsers" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="C__MigrationHistory">
@@ -459,17 +488,6 @@
           <NavigationProperty Name="Users" Relationship="DealWatcherService_dbModel.FK_Users_0" FromRole="AspNetUser" ToRole="User" />
           <NavigationProperty Name="AspNetRoles" Relationship="DealWatcherService_dbModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
         </EntityType>
-        <EntityType Name="ProductCode">
-          <Key>
-            <PropertyRef Name="TypeId" />
-            <PropertyRef Name="ProductId" />
-          </Key>
-          <Property Name="TypeId" Type="Int32" Nullable="false" />
-          <Property Name="ProductId" Type="Int32" Nullable="false" />
-          <Property Name="Code" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ProductCodeType" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCode" ToRole="ProductCodeType" />
-          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="ProductCode" ToRole="Product" />
-        </EntityType>
         <EntityType Name="ProductCodeType">
           <Key>
             <PropertyRef Name="Id" />
@@ -477,8 +495,8 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ProprietarySellerId" Type="Int32" />
-          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCodeType" ToRole="ProductCode" />
           <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="ProductCodeType" ToRole="Seller" />
+          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCodeType" ToRole="ProductCode" />
         </EntityType>
         <EntityType Name="ProductImage">
           <Key>
@@ -489,28 +507,14 @@
           <Property Name="Url" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="ProductImage" ToRole="Product" />
         </EntityType>
-        <EntityType Name="ProductPrice">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ProductId" Type="Int32" Nullable="false" />
-          <Property Name="SellerId" Type="Int32" Nullable="false" />
-          <Property Name="Gathered" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="LocationUrl" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Price" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="Current" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="ProductPrice" ToRole="Product" />
-          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="ProductPrice" ToRole="Seller" />
-        </EntityType>
         <EntityType Name="Product">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="Product" ToRole="ProductCode" />
           <NavigationProperty Name="ProductImages" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="Product" ToRole="ProductImage" />
+          <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="Product" ToRole="ProductCode" />
           <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="Product" ToRole="ProductPrice" />
         </EntityType>
         <EntityType Name="RegistrationToken">
@@ -531,6 +535,7 @@
           <Property Name="Website" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PriceSource" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ProductCodeTypes" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="Seller" ToRole="ProductCodeType" />
+          <NavigationProperty Name="PriceCacheDuration" Relationship="DealWatcherService_dbModel.FK_PriceCacheDurations_0" FromRole="Seller" ToRole="PriceCacheDuration" />
           <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="Seller" ToRole="ProductPrice" />
         </EntityType>
         <EntityType Name="User">
@@ -586,30 +591,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProductCodes_0">
-          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="1" />
-          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProductCodeType">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ProductCode">
-              <PropertyRef Name="TypeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProductCodes_1">
-          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
-          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ProductCode">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ProductCodeTypes_0">
           <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="0..1" />
           <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="*" />
@@ -634,6 +615,79 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="AspNetUserRoles">
+          <End Type="DealWatcherService_dbModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
+          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
+        </Association>
+        <EntityType Name="ProductCode">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="ProductCodeType" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCode" ToRole="ProductCodeType" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="ProductCode" ToRole="Product" />
+        </EntityType>
+        <Association Name="FK_ProductCodes_0">
+          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductCodeType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCode">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductCodes_1">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductCode">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="PriceCacheDuration">
+          <Key>
+            <PropertyRef Name="SellerId" />
+          </Key>
+          <Property Name="SellerId" Type="Int32" Nullable="false" />
+          <Property Name="CacheLifetime" Type="Time" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_PriceCacheDurations_0" FromRole="PriceCacheDuration" ToRole="Seller" />
+        </EntityType>
+        <Association Name="FK_PriceCacheDurations_0">
+          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.PriceCacheDuration" Role="PriceCacheDuration" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Seller">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PriceCacheDuration">
+              <PropertyRef Name="SellerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ProductPrice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="SellerId" Type="Int32" Nullable="false" />
+          <Property Name="Gathered" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="LocationUrl" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="Current" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="ProductPrice" ToRole="Product" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="ProductPrice" ToRole="Seller" />
+        </EntityType>
         <Association Name="FK_ProductPrices_0">
           <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
           <End Type="DealWatcherService_dbModel.ProductPrice" Role="ProductPrice" Multiplicity="*" />
@@ -657,10 +711,6 @@
               <PropertyRef Name="SellerId" />
             </Dependent>
           </ReferentialConstraint>
-        </Association>
-        <Association Name="AspNetUserRoles">
-          <End Type="DealWatcherService_dbModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
-          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
         </Association>
         </Schema>
     </edmx:ConceptualModels>
@@ -723,15 +773,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ProductCodes">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCode">
-              <MappingFragment StoreEntitySet="ProductCodes">
-                <ScalarProperty Name="Code" ColumnName="Code" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ProductCodeTypes">
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCodeType">
               <MappingFragment StoreEntitySet="ProductCodeTypes">
@@ -745,19 +786,6 @@
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductImage">
               <MappingFragment StoreEntitySet="ProductImages">
                 <ScalarProperty Name="Url" ColumnName="Url" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ProductPrices">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductPrice">
-              <MappingFragment StoreEntitySet="ProductPrices">
-                <ScalarProperty Name="Current" ColumnName="Current" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="LocationUrl" ColumnName="LocationUrl" />
-                <ScalarProperty Name="Gathered" ColumnName="Gathered" />
-                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
@@ -810,6 +838,37 @@
               <ScalarProperty Name="Id" ColumnName="RoleId" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="ProductCodes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCode">
+              <MappingFragment StoreEntitySet="ProductCodes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PriceCacheDurations">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.PriceCacheDuration">
+              <MappingFragment StoreEntitySet="PriceCacheDurations">
+                <ScalarProperty Name="CacheLifetime" ColumnName="CacheLifetime" />
+                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductPrices">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductPrice">
+              <MappingFragment StoreEntitySet="ProductPrices">
+                <ScalarProperty Name="Current" ColumnName="Current" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="LocationUrl" ColumnName="LocationUrl" />
+                <ScalarProperty Name="Gathered" ColumnName="Gathered" />
+                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

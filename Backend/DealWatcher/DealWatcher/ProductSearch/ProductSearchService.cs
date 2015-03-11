@@ -32,7 +32,7 @@ namespace DealWatcher.ProductSearch
 
             await Task.WhenAll(searchTasks);
 
-            return searchResults;
+            return searchResults.OrderBy(prod => prod.Id);
         }
 
         public async static Task<IEnumerable<ProductPrice>> SearchProductPricesAsync(DealWatcherService_dbEntities entities, Product search)

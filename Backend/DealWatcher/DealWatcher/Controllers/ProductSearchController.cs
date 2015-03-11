@@ -11,6 +11,7 @@ using AutoMapper;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Text;
+using System.Web.Http.Description;
 
 namespace DealWatcher.Controllers
 {
@@ -48,10 +49,16 @@ namespace DealWatcher.Controllers
         }
 
         // POST: api/ProductSearch
-        public async Task<IEnumerable<Product>> Post(ProductSearchBindingModel value)
+        [ResponseType(typeof(IEnumerable<ProductViewModel>))]
+        public async Task<IHttpActionResult> Post(ProductSearchBindingModel value)
         {
+            if (ModelState.IsValid)
+            {
+                var searchResults = await ProductSearchService.SearchAsync(db, value);
+                return Ok(Mapper.Map(searchResults, new List<ProductViewModel>()));
+            }
 
-            return null;
+            return new System.Web.Http.Results.BadRequestResult(this);
         }
 
         protected override void Dispose(bool disposing)

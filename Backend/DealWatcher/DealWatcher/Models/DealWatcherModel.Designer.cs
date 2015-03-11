@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model '\\psf\Home\Documents\Projects\DealWatcher\Backend\DealWatcher\DealWatcher\Models\DealWatcherModel.edmx'. 
+﻿// T4 code generation is enabled for model 'E:\Git\DealWatcher\Backend\DealWatcher\DealWatcher\Models\DealWatcherModel.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

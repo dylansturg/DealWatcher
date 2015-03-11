@@ -31,31 +31,39 @@ namespace DealWatcher.ProductSearch.ProductSource
 
         private IEnumerable<Product> CombineAmazonProducts(DealWatcherService_dbEntities db, IEnumerable<AmazonProduct> products)
         {
-            var sortedProducts = new Dictionary<String, Product>();
+            var foundProducts = new Dictionary<String, Product>();
+            var savedProductIds = new HashSet<int>();
+
             var amazonSeller = db.Sellers.First(seller => seller.Name == AmazonSellerName);
 
             foreach (var amazonProduct in products)
             {
-                if (!sortedProducts.ContainsKey(amazonProduct.ASIN))
+                if (!foundProducts.ContainsKey(amazonProduct.ASIN))
                 {
-                    sortedProducts.Add(amazonProduct.ASIN, GetOrCreateProduct(db, amazonProduct));
+                    foundProducts.Add(amazonProduct.ASIN, GetOrCreateProduct(db, amazonProduct));
                 }
 
-                var product = sortedProducts[amazonProduct.ASIN];
+                var product = foundProducts[amazonProduct.ASIN];
                 
                 UpdateProductCodes(db, product, amazonProduct);
-                AppendFoundPrice(amazonProduct, product, amazonSeller);
+                AppendFoundPrice(db, amazonProduct, product, amazonSeller);
                 UpdateProductImages(product, amazonProduct);
 
-                db.UpdateGraph(product,
+                var attachedProduct = db.UpdateGraph(product,
                     map =>
                         map.OwnedCollection(p => p.ProductCodes)
                             .OwnedCollection(p => p.ProductImages)
                             .OwnedCollection(p => p.ProductPrices));
                 db.SaveChanges();
+
+                if (attachedProduct != null)
+                {
+                    savedProductIds.Add(attachedProduct.Id);
+                }
+
             }
 
-            return sortedProducts.Values.ToList();
+            return savedProductIds.Select(id => db.Products.Find(id));
         }
 
         private static void UpdateProductImages(Product product, AmazonProduct amazonProduct)
@@ -75,8 +83,20 @@ namespace DealWatcher.ProductSearch.ProductSource
             }
         }
 
-        private static void AppendFoundPrice(AmazonProduct amazonProduct, Product product, Seller seller)
+        private static void AppendFoundPrice(DealWatcherService_dbEntities db, AmazonProduct amazonProduct, Product product, Seller seller)
         {
+            if (product.ProductPrices.Any(price =>
+            {
+                var matches = true;
+                matches &= price.SellerId == seller.Id;
+                matches &= price.Price == (Decimal) amazonProduct.Price;
+                matches &= price.Gathered > (DateTime.UtcNow.Subtract(TimeSpan.FromHours(1)));
+                return matches;
+            }))
+            {
+                return;
+            }
+
             var foundPrice = new ProductPrice()
             {
                 Current = true,
