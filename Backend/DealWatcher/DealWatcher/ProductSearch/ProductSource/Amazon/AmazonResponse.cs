@@ -82,7 +82,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             ParsedResults = amazonProds;
         }
 
-        private double SelectItemPrice(Item item)
+        private static double SelectItemPrice(Item item)
         {
             if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null)
             {
@@ -108,7 +108,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             return Double.Parse(String.Format("{0}.{1}", digits, decimals));
         }
 
-        private HashSet<string> SelectItemImage(Item item)
+        private static IEnumerable<string> SelectItemImage(Item item)
         {
             var result = new HashSet<String>();
             if (item.ItemLargeImage != null && item.ItemLargeImage.ItemImageURL != null)
@@ -126,7 +126,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             return result;
         }
 
-        private Stream StringStream(String s)
+        private static Stream StringStream(String s)
         {
             return new MemoryStream(Encoding.UTF8.GetBytes(s ?? ""));
         }

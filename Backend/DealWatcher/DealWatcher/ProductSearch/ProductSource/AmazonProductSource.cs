@@ -9,13 +9,13 @@ using WebGrease.Css.Extensions;
 
 namespace DealWatcher.ProductSearch.ProductSource
 {
-    public class AmazonProductSource : IProductSource
+    public class AmazonProductSource : ProductSourceBase
     {
         public const string AmazonCodeType = "ASIN";
         public const string AmazonSellerName = "Amazon";
         public const int DisplayNameLength = 100;
 
-        public async Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search)
+        public override async Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search)
         {
             var request = new AmazonRequest(search);
             var searchResponses = await request.ExecuteAsync();
@@ -85,12 +85,15 @@ namespace DealWatcher.ProductSearch.ProductSource
 
         private static void AppendFoundPrice(DealWatcherService_dbEntities db, AmazonProduct amazonProduct, Product product, Seller seller)
         {
+            var cacheExpiration = db.PriceCacheDurations.FirstOrDefault(duration => duration.SellerId == seller.Id);
+            var cacheDuration = cacheExpiration != null ? cacheExpiration.CacheLifetime : DefaultPriceCacheDuration;
+
             if (product.ProductPrices.Any(price =>
             {
                 var matches = true;
                 matches &= price.SellerId == seller.Id;
                 matches &= price.Price == (Decimal) amazonProduct.Price;
-                matches &= price.Gathered > (DateTime.UtcNow.Subtract(TimeSpan.FromHours(1)));
+                matches &= price.Gathered.UtcDateTime > DateTime.UtcNow.Subtract(cacheDuration);
                 return matches;
             }))
             {
@@ -111,7 +114,7 @@ namespace DealWatcher.ProductSearch.ProductSource
             product.ProductPrices.Add(foundPrice);
         }
 
-        private void UpdateProductCodes(DealWatcherService_dbEntities db, Product product, AmazonProduct amazonProduct)
+        private static void UpdateProductCodes(DealWatcherService_dbEntities db, Product product, AmazonProduct amazonProduct)
         {
             var existingCodes = product.ProductCodes.ToList();
 
