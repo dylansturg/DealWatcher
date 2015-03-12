@@ -30,6 +30,9 @@
         <EntityTypeShape EntityType="DealWatcherService_dbModel.ProductPrice" Width="1.5" PointX="10.75" PointY="4.375" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_0" />
         <AssociationConnector Association="DealWatcherService_dbModel.FK_ProductPrices_1" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.Configuration" Width="1.5" PointX="3" PointY="13.875" />
+        <EntityTypeShape EntityType="DealWatcherService_dbModel.ConfigurationValueType" Width="1.5" PointX="0.75" PointY="14" />
+        <AssociationConnector Association="DealWatcherService_dbModel.FK_Configurations_0" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

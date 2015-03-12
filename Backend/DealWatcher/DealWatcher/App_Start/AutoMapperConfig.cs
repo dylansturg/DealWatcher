@@ -30,6 +30,7 @@ namespace DealWatcher
 
             Mapper.CreateMap<ProductSearchBindingModel, ProductSearchViewModel>();
 
+            Mapper.CreateMap<Configuration, ConfigurationViewModel>();
         }
     }
 }

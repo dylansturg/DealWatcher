@@ -249,7 +249,11 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="ConfigurationManagement\ConfigurationValueFactory.cs" />
+    <Compile Include="ConfigurationManagement\InvalidConfigurationException.cs" />
+    <Compile Include="ConfigurationManagement\RemoteConfigurationManager.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ConfigurationsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\ProductSearchController.cs" />
@@ -297,6 +301,13 @@
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\AzureDatabaseConfiguration.cs" />
+    <Compile Include="Models\Configuration.cs">
+      <DependentUpon>DealWatcherModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ConfigurationModels.cs" />
+    <Compile Include="Models\ConfigurationValueType.cs">
+      <DependentUpon>DealWatcherModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\C__MigrationHistory.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>

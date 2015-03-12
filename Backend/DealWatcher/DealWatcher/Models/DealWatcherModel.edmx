@@ -66,6 +66,23 @@
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
         </EntityType>
+        <EntityType Name="Configurations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Key" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="TypeId" Type="int" Nullable="false" />
+          <Property Name="Value" Type="varbinary(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ConfigurationValueTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Class" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
         <EntityType Name="PriceCacheDurations">
           <Key>
             <PropertyRef Name="SellerId" />
@@ -145,6 +162,18 @@
           <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
           <Property Name="LastName" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK_Configurations_0">
+          <End Role="ConfigurationValueTypes" Type="Self.ConfigurationValueTypes" Multiplicity="1" />
+          <End Role="Configurations" Type="Self.Configurations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ConfigurationValueTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Configurations">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -306,6 +335,8 @@
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Configurations" EntityType="Self.Configurations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ConfigurationValueTypes" EntityType="Self.ConfigurationValueTypes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PriceCacheDurations" EntityType="Self.PriceCacheDurations" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductCodes" EntityType="Self.ProductCodes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductCodeTypes" EntityType="Self.ProductCodeTypes" Schema="dbo" store:Type="Tables" />
@@ -315,6 +346,10 @@
           <EntitySet Name="RegistrationTokens" EntityType="Self.RegistrationTokens" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sellers" EntityType="Self.Sellers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Configurations_0" Association="Self.FK_Configurations_0">
+            <End Role="ConfigurationValueTypes" EntitySet="ConfigurationValueTypes" />
+            <End Role="Configurations" EntitySet="Configurations" />
+          </AssociationSet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -426,6 +461,12 @@
           <AssociationSet Name="FK_ProductPrices_1" Association="DealWatcherService_dbModel.FK_ProductPrices_1">
             <End Role="Seller" EntitySet="Sellers" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
+          </AssociationSet>
+          <EntitySet Name="Configurations" EntityType="DealWatcherService_dbModel.Configuration" />
+          <EntitySet Name="ConfigurationValueTypes" EntityType="DealWatcherService_dbModel.ConfigurationValueType" />
+          <AssociationSet Name="FK_Configurations_0" Association="DealWatcherService_dbModel.FK_Configurations_0">
+            <End Role="ConfigurationValueType" EntitySet="ConfigurationValueTypes" />
+            <End Role="Configuration" EntitySet="Configurations" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="C__MigrationHistory">
@@ -712,6 +753,37 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Key" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="Value" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="ConfigurationValueType" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="Configuration" ToRole="ConfigurationValueType" />
+        </EntityType>
+        <EntityType Name="ConfigurationValueType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Class" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Configurations" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="ConfigurationValueType" ToRole="Configuration" />
+        </EntityType>
+        <Association Name="FK_Configurations_0">
+          <End Type="DealWatcherService_dbModel.ConfigurationValueType" Role="ConfigurationValueType" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.Configuration" Role="Configuration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ConfigurationValueType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Configuration">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -865,6 +937,25 @@
                 <ScalarProperty Name="Gathered" ColumnName="Gathered" />
                 <ScalarProperty Name="SellerId" ColumnName="SellerId" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Configurations">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.Configuration">
+              <MappingFragment StoreEntitySet="Configurations">
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+                <ScalarProperty Name="Key" ColumnName="Key" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ConfigurationValueTypes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ConfigurationValueType">
+              <MappingFragment StoreEntitySet="ConfigurationValueTypes">
+                <ScalarProperty Name="Class" ColumnName="Class" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

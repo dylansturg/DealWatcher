@@ -39,5 +39,7 @@ namespace DealWatcher.Models
         public virtual DbSet<ProductCode> ProductCodes { get; set; }
         public virtual DbSet<PriceCacheDuration> PriceCacheDurations { get; set; }
         public virtual DbSet<ProductPrice> ProductPrices { get; set; }
+        public virtual DbSet<Configuration> Configurations { get; set; }
+        public virtual DbSet<ConfigurationValueType> ConfigurationValueTypes { get; set; }
     }
 }
