@@ -58,7 +58,8 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                 return;
             }
 
-            var amazonProds = items.Select(item =>
+            Exception parseFailure = null;
+            var converted = items.Select(item =>
             {
                 try
                 {
@@ -73,22 +74,26 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                         Price = SelectItemPrice(item),
                     };
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    parseFailure = e;
                     return null;
                 }
-            }).Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
+            });
+            
+            var amazonProds = converted.Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
 
             ParsedResults = amazonProds;
         }
 
         private static double SelectItemPrice(Item item)
         {
-            if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null)
+            if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null && item.OfferSummary.LowestNewPrice.ListPriceAmount != null)
             {
                 return ParsePriceAmount(item.OfferSummary.LowestNewPrice.ListPriceAmount.Value.ToString());
             }
-            else if (item.ItemAttributes != null && item.ItemAttributes.ListPrice != null)
+            
+            if (item.ItemAttributes != null && item.ItemAttributes.ListPrice != null && item.ItemAttributes.ListPrice.ListPriceAmount != null)
             {
                 return ParsePriceAmount(item.ItemAttributes.ListPrice.ListPriceAmount.Value.ToString());
             }

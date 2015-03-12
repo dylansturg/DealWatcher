@@ -20,9 +20,13 @@ namespace DealWatcher.ProductSearch.ProductSource
             var request = new AmazonRequest(search);
             var searchResponses = await request.ExecuteAsync();
             var amazonSearchResults = new List<AmazonProduct>();
-            foreach (var response in searchResponses)
+            if (searchResponses == null || !searchResponses.Any())
             {
-                var amazonProducts = response.ParsedResults;
+                return new List<Product>();
+            }
+
+            foreach (var amazonProducts in searchResponses.Where(resp => resp != null).Select(response => response.ParsedResults))
+            {
                 amazonSearchResults.AddRange(amazonProducts);
             }
 

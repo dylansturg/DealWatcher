@@ -18,9 +18,11 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         }
 
         private const string AmazonCodeType = "ASIN";
-        private const int MaxItemPages = 6;
+        private const int AmazonMaxPages = 5;
+        private int MaxItemPages { get; set; }
+
         protected Operation RequestType { get; set; }
-        protected int Page = 1;
+        protected int Page = 0;
 
         protected String ProductCode { get; set; }
         protected String ProductCodeType { get; set; }
@@ -58,6 +60,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         {
             RequestType = Operation.ItemSearch;
             ProductName = searchTerms;
+            MaxItemPages = AmazonMaxPages;
         }
 
         private void SetupItemLookup(String productCode, String codeType)
@@ -65,6 +68,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             RequestType = Operation.ItemLookup;
             ProductCode = productCode;
             ProductCodeType = codeType;
+            MaxItemPages = 1;
         }
 
         public async Task<IEnumerable<AmazonResponse>> ExecuteAsync()
@@ -87,7 +91,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                             var apiResponse = await client.GetStringAsync(uri);
                             var response = new AmazonResponse(RequestType);
                             await response.ParseResultsAsync(apiResponse);
-                            results[index - 1] = response;
+                            results[index] = response;
                         }
                         catch (Exception httpException)
                         {
@@ -142,7 +146,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         {
             request.Add("Availability", "Available");
             request.Add("ResponseGroup", "ItemAttributes,Images,OfferSummary");
-            request.Add("ItemPage", Page.ToString());
+            request.Add("ItemPage", (Page + 1).ToString());
         }
     }
 
