@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using DealWatcher.ConfigurationManagement;
 
 namespace DealWatcher
 {
@@ -30,7 +31,17 @@ namespace DealWatcher
 
             Mapper.CreateMap<ProductSearchBindingModel, ProductSearchViewModel>();
 
-            Mapper.CreateMap<Configuration, ConfigurationViewModel>();
+            Mapper.CreateMap<Configuration, ConfigurationViewModel>().ConvertUsing(model =>
+            {
+                var convertedValue = RemoteConfigurationManager.Configuration.BytesToConfig(model.Value);
+                return new ConfigurationViewModel
+                {
+                    Key = model.Key,
+                    Type = convertedValue.GetType().Name,
+                    Value = convertedValue
+                };
+            });
+          
         }
     }
 }

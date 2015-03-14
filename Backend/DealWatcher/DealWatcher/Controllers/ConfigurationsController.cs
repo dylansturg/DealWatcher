@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -15,14 +11,16 @@ using DealWatcher.Models;
 
 namespace DealWatcher.Controllers
 {
+    [Authorize(Roles = "ConfigurationEditor")]
     public class ConfigurationsController : ApiController
     {
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
 
         // GET: api/Configurations
-        public IQueryable<Configuration> GetConfigurations()
+        public IEnumerable<ConfigurationViewModel> GetConfigurations()
         {
-            return db.Configurations;
+            var results = Mapper.Map(db.Configurations.ToList(), new List<ConfigurationViewModel>());
+            return results;
         }
 
         [Route("TestSave")]
@@ -32,8 +30,8 @@ namespace DealWatcher.Controllers
             RemoteConfigurationManager.Configuration.SaveConfig(
                 "A Configuration String that can be changed at run time", "MyFancyKey");
 
-            RemoteConfigurationManager.Configuration.SaveConfig(32, "MyIntKey");
-            var intConfig = RemoteConfigurationManager.Configuration.FetchConfig<Int32>("MyIntKey");
+            RemoteConfigurationManager.Configuration.SaveConfig((Int16) 12, "MyIntKey");
+            var intConfig = RemoteConfigurationManager.Configuration.FetchConfig<int>("MyIntKey");
 
             RemoteConfigurationManager.Configuration.SaveConfig(TimeSpan.FromDays(1), "MyTimeSpanKey");
             var timespanConfig = RemoteConfigurationManager.Configuration.FetchConfig<TimeSpan>("MyTimeSpanKey");
@@ -42,89 +40,49 @@ namespace DealWatcher.Controllers
             return Ok(savedConfig);
         }
 
-        // GET: api/Configurations/5
-        [ResponseType(typeof(Configuration))]
-        public async Task<IHttpActionResult> GetConfiguration(int id)
+        [ResponseType(typeof(ConfigurationViewModel))]
+        public IHttpActionResult GetConfiguration(String key)
         {
-            Configuration configuration = await db.Configurations.FindAsync(id);
-            if (configuration == null)
+            try
+            {
+                var config = RemoteConfigurationManager.Configuration.FetchConfig(key);
+                return Ok(new ConfigurationViewModel()
+                {
+                    Key = key,
+                    Value = config,
+                    Type = config.GetType().Name,
+                });
+            }
+            catch (InvalidConfigurationException)
             {
                 return NotFound();
             }
-
-            return Ok(configuration);
-        }
-
-        // PUT: api/Configurations/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutConfiguration(int id, Configuration configuration)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != configuration.Id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(configuration).State = EntityState.Modified;
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ConfigurationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
 
         // POST: api/Configurations
-        [ResponseType(typeof(Configuration))]
-        public async Task<IHttpActionResult> PostConfiguration(Configuration configuration)
+        [ResponseType(typeof(ConfigurationViewModel))]
+        public IHttpActionResult PostConfiguration(ConfigurationViewModel configuration)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Configurations.Add(configuration);
-
-            try
+            RemoteConfigurationManager.Configuration.SaveConfig(configuration.Value, configuration.Key);
+            var savedConfig = RemoteConfigurationManager.Configuration.FetchConfig(configuration.Key);
+            return Ok(new ConfigurationViewModel
             {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (ConfigurationExists(configuration.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtRoute("DefaultApi", new { id = configuration.Id }, configuration);
+                Key = configuration.Key,
+                Value = savedConfig,
+                Type = savedConfig.GetType().Name,
+            });
         }
 
         // DELETE: api/Configurations/5
-        [ResponseType(typeof(Configuration))]
-        public async Task<IHttpActionResult> DeleteConfiguration(int id)
+        public async Task<IHttpActionResult> DeleteConfiguration(String key)
         {
-            Configuration configuration = await db.Configurations.FindAsync(id);
+            var configuration = await
+                db.Configurations.FirstOrDefaultAsync(c => c.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase));
             if (configuration == null)
             {
                 return NotFound();
@@ -132,8 +90,8 @@ namespace DealWatcher.Controllers
 
             db.Configurations.Remove(configuration);
             await db.SaveChangesAsync();
-
-            return Ok(configuration);
+            RemoteConfigurationManager.Configuration.RefreshConfigurations();
+            return Ok();
         }
 
         protected override void Dispose(bool disposing)

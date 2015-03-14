@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -7,17 +8,10 @@ namespace DealWatcher.Models
 {
     public class ConfigurationViewModel
     {
-        public int Id { get; set; }
+        [Required]
         public String Key { get; set; }
+        [Required]
         public Object Value { get; set; }
+        public String Type { get; set; }
     }
-
-    public class ConfigurationBindingModel
-    {
-        public int Id { get; set; }
-        public String Key { get; set; }
-        public Object Value { get; set; }
-        public int TypeId { get; set; }
-    }
-    
 }
