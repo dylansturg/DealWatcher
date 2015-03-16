@@ -41,7 +41,6 @@ namespace DealWatcher
                     Value = convertedValue
                 };
             });
-          
         }
     }
 }

@@ -19,34 +19,6 @@ namespace DealWatcher.Controllers
     public class ProductSearchController : ApiController
     {
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
-        // GET: api/ProductSearch
-        public async Task<IEnumerable<ProductViewModel>> Get()
-        {
-            try
-            {
-                var searchResults = await ProductSearchService.SearchAsync(db, new ProductSearchBindingModel()
-                {
-                    Keywords = "iPad",
-                });
-                return Mapper.Map(searchResults, new List<ProductViewModel>());
-            }
-            catch (DbEntityValidationException dbEx)
-            {
-                StringBuilder errors = new StringBuilder();
-                foreach (var validationErrors in dbEx.EntityValidationErrors)
-                {
-                    foreach (var validationError in validationErrors.ValidationErrors)
-                    {
-                        errors.Append(String.Format("Property: {0} Error: {1}&", validationError.PropertyName, validationError.ErrorMessage));
-                        Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
-                    }
-                }
-                String errorMessage = errors.ToString();
-                Console.WriteLine(errorMessage);
-            }
-
-            return null;
-        }
 
         // POST: api/ProductSearch
         [ResponseType(typeof(IEnumerable<ProductViewModel>))]
