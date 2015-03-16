@@ -15,147 +15,25 @@ namespace DealWatcher.ProductSearch.ProductSource
         public const string AmazonSellerName = "Amazon";
         public const int DisplayNameLength = 100;
 
-        public override async Task<IEnumerable<Product>> SearchAsync(DealWatcherService_dbEntities db, ProductSearchViewModel search)
+        protected ProductCodeType AmazonProductCodeType { get; private set; }
+        protected Seller AmazonSeller { get; private set; }
+
+        protected override Seller ProductSeller(DealWatcherService_dbEntities entities)
         {
-            var request = new AmazonRequest(search);
-            var searchResponses = await request.ExecuteAsync();
-            var amazonSearchResults = new List<AmazonProduct>();
-            if (searchResponses == null || !searchResponses.Any())
-            {
-                return new List<Product>();
-            }
-
-            foreach (var amazonProducts in searchResponses.Where(resp => resp != null).Select(response => response.ParsedResults))
-            {
-                amazonSearchResults.AddRange(amazonProducts);
-            }
-
-            return CombineAmazonProducts(db, amazonSearchResults);
+            return AmazonSeller ?? (AmazonSeller = entities.Sellers.First(seller => seller.Name == AmazonSellerName));
         }
 
-        private IEnumerable<Product> CombineAmazonProducts(DealWatcherService_dbEntities db, IEnumerable<AmazonProduct> products)
+        protected override ProductCodeType SellersProductCodeType(DealWatcherService_dbEntities entities)
         {
-            var foundProducts = new Dictionary<String, Product>();
-            var savedProductIds = new HashSet<int>();
-
-            var amazonSeller = db.Sellers.First(seller => seller.Name == AmazonSellerName);
-
-            foreach (var amazonProduct in products)
-            {
-                if (!foundProducts.ContainsKey(amazonProduct.ASIN))
-                {
-                    foundProducts.Add(amazonProduct.ASIN, GetOrCreateProduct(db, amazonProduct));
-                }
-
-                var product = foundProducts[amazonProduct.ASIN];
-                
-                UpdateProductCodes(db, product, amazonProduct);
-                AppendFoundPrice(db, amazonProduct, product, amazonSeller);
-                UpdateProductImages(product, amazonProduct);
-
-                var attachedProduct = db.UpdateGraph(product,
-                    map =>
-                        map.OwnedCollection(p => p.ProductCodes)
-                            .OwnedCollection(p => p.ProductImages)
-                            .OwnedCollection(p => p.ProductPrices));
-                db.SaveChanges();
-
-                if (attachedProduct != null)
-                {
-                    savedProductIds.Add(attachedProduct.Id);
-                }
-
-            }
-
-            return savedProductIds.Select(id => db.Products.Find(id));
+            return AmazonProductCodeType ??
+                   (AmazonProductCodeType = entities.ProductCodeTypes.First(code => code.Type == AmazonCodeType));
         }
 
-        private static void UpdateProductImages(Product product, AmazonProduct amazonProduct)
+        protected override Product GetEquivalentOrCreateProduct(DealWatcherService_dbEntities entities, IApiProduct apiProduct)
         {
-            var existingImages = product.ProductImages.ToList();
-            foreach (var image in amazonProduct.ImageUrls)
-            {
-                if (!existingImages.Any(prodImg => prodImg.Url == image))
-                {
-                    product.ProductImages.Add(new ProductImage()
-                    {
-                        Product = product,
-                        Url = image,
-                        ProductId = product.Id
-                    });
-                }
-            }
-        }
-
-        private static void AppendFoundPrice(DealWatcherService_dbEntities db, AmazonProduct amazonProduct, Product product, Seller seller)
-        {
-            var cacheExpiration = db.PriceCacheDurations.FirstOrDefault(duration => duration.SellerId == seller.Id);
-            var cacheDuration = cacheExpiration != null ? cacheExpiration.CacheLifetime : DefaultPriceCacheDuration;
-
-            if (product.ProductPrices.Any(price =>
-            {
-                var matches = true;
-                matches &= price.SellerId == seller.Id;
-                matches &= price.Price == (Decimal) amazonProduct.Price;
-                matches &= price.Gathered.UtcDateTime > DateTime.UtcNow.Subtract(cacheDuration);
-                return matches;
-            }))
-            {
-                return;
-            }
-
-            var foundPrice = new ProductPrice()
-            {
-                Current = true,
-                Gathered = DateTime.Now,
-                LocationUrl = amazonProduct.DetailsUrl,
-                Price = (Decimal) amazonProduct.Price,
-                Product = product,
-                ProductId = product.Id,
-                Seller = seller,
-                SellerId = seller.Id
-            };
-            product.ProductPrices.Add(foundPrice);
-        }
-
-        private static void UpdateProductCodes(DealWatcherService_dbEntities db, Product product, AmazonProduct amazonProduct)
-        {
-            var existingCodes = product.ProductCodes.ToList();
-
-            var foundCodes = new Dictionary<String, String> {{amazonProduct.ASIN, AmazonCodeType}};
-            amazonProduct.EANs.ForEach(ean => foundCodes.Add(ean, "EAN"));
-            amazonProduct.UPCs.ForEach(upc => foundCodes.Add(upc, "UPC"));
-
-            foreach (var productCode in foundCodes)
-            {
-                if (
-                    !existingCodes.Any(
-                        code => code.Code == productCode.Key && code.ProductCodeType.Type == productCode.Value))
-                {
-                    var codeType = db.ProductCodeTypes.FirstOrDefault(type => type.Type == productCode.Value);
-                    if (codeType == null)
-                    {
-                        throw new ProductSearchException(
-                            String.Format("AmazonProductSource failed to find ProductCodeType for Type {0}",
-                                productCode.Value));
-                    }
-
-                    var createdProductCode = new ProductCode()
-                    {
-                        Code = productCode.Key,
-                        ProductCodeType = codeType,
-                        Product = product,
-                        TypeId = codeType.Id,
-                    };
-                    product.ProductCodes.Add(createdProductCode);
-                }
-            }
-        }
-
-
-        private Product GetOrCreateProduct(DealWatcherService_dbEntities db, AmazonProduct amazonProduct)
-        {
-            var amazonsCode = db.ProductCodeTypes.FirstOrDefault(type => type.Type == AmazonCodeType);
+            var amazonsCode = AmazonProductCodeType ??
+                              (AmazonProductCodeType =
+                                  entities.ProductCodeTypes.FirstOrDefault(type => type.Type == AmazonCodeType));
             if (amazonsCode == null)
             {
                 throw new ProductSearchException(
@@ -163,8 +41,16 @@ namespace DealWatcher.ProductSearch.ProductSource
                         AmazonCodeType));
             }
 
+            var amazonProduct = apiProduct as AmazonProduct;
+            if (amazonProduct == null)
+            {
+                throw new ProductSearchException(
+                    "AmazonProductSource expected ApiProducts of type AmazonProduct, received " +
+                    apiProduct.GetType().FullName);
+            }
+
             var existingProduct =
-                db.ProductCodes.AsNoTracking().Where(
+                entities.ProductCodes.AsNoTracking().Where(
                     code => code.Code == amazonProduct.ASIN && code.ProductCodeType.Id == amazonsCode.Id)
                     .Select(code => code.Product);
             if (existingProduct.Any())
@@ -174,10 +60,112 @@ namespace DealWatcher.ProductSearch.ProductSource
 
             var product = new Product()
             {
-                DisplayName = amazonProduct.Title.Length <= DisplayNameLength ? 
+                DisplayName = amazonProduct.Title.Length <= DisplayNameLength ?
                     amazonProduct.Title : amazonProduct.Title.Substring(0, DisplayNameLength - 3) + "...",
             };
             return product;
+        }
+
+        protected override void AppendNewProductCodes(DealWatcherService_dbEntities entities, Product baseProduct, IApiProduct apiProduct)
+        {
+            var existingCodes = baseProduct.ProductCodes.ToList();
+            var amazonProduct = apiProduct as AmazonProduct;
+            if (amazonProduct == null)
+            {
+                throw new ProductSearchException(
+                    "AmazonProductSource expected ApiProducts of type AmazonProduct, received " +
+                    apiProduct.GetType().FullName);
+            }
+
+            var foundCodes = new Dictionary<String, String> { { amazonProduct.ASIN, AmazonCodeType } };
+            amazonProduct.EANs.ForEach(ean => foundCodes.Add(ean, "EAN"));
+            amazonProduct.UPCs.ForEach(upc => foundCodes.Add(upc, "UPC"));
+
+            foreach (var productCode in foundCodes)
+            {
+                if (existingCodes.Any(
+                    code => code.Code == productCode.Key && code.ProductCodeType.Type == productCode.Value))
+                {
+                    // Ignore ig already exists
+                    continue;
+                }
+                var codeType = entities.ProductCodeTypes.FirstOrDefault(type => type.Type == productCode.Value);
+                if (codeType == null)
+                {
+                    throw new ProductSearchException(
+                        String.Format("AmazonProductSource failed to find ProductCodeType for Type {0}",
+                            productCode.Value));
+                }
+
+                var createdProductCode = new ProductCode()
+                {
+                    Code = productCode.Key,
+                    ProductCodeType = codeType,
+                    Product = baseProduct,
+                    TypeId = codeType.Id,
+                };
+                baseProduct.ProductCodes.Add(createdProductCode);
+            }
+        }
+
+        protected override void AppendNewProductPrices(DealWatcherService_dbEntities entities, Product baseProduct, IApiProduct apiProduct)
+        {
+            var seller = ProductSeller(entities);
+            var amazonProduct = apiProduct as AmazonProduct;
+            if (amazonProduct == null)
+            {
+                throw new ProductSearchException("Invalid IApiProduct for AppendNewProductPrices in AmazonProductSource");
+            }
+
+            var cacheDuration = ProductCacheLifetime(entities);
+            var existingMatchingPrice = baseProduct.ProductPrices.FirstOrDefault(price =>
+            {
+                var matches = price.SellerId == seller.Id;
+                matches &= price.Price == (Decimal) amazonProduct.Price;
+                matches &= price.Gathered.UtcDateTime > DateTime.UtcNow.Subtract(cacheDuration);
+                return matches;
+            });
+
+            if (existingMatchingPrice != null)
+            {
+                return;
+            }
+
+            var foundPrice = new ProductPrice()
+            {
+                Current = true,
+                Gathered = DateTime.Now,
+                LocationUrl = amazonProduct.DetailsUrl,
+                Price = (Decimal)amazonProduct.Price,
+                Product = baseProduct,
+                Seller = seller,
+                SellerId = seller.Id
+            };
+
+            baseProduct.ProductPrices.Add(foundPrice);
+        }
+
+        protected override void AppendNewProductImages(DealWatcherService_dbEntities entities, Product baseProduct, IApiProduct apiProduct)
+        {
+            var amazonProduct = apiProduct as AmazonProduct;
+            if (amazonProduct == null)
+            {
+                throw new ProductSearchException("AppendNewProductImages received invalid IApiProduct in AmazonProductSource");
+            }
+            var existingImages = baseProduct.ProductImages.ToList();
+            foreach (var image in amazonProduct.ImageUrls.Where(image => existingImages.All(prodImg => prodImg.Url != image)))
+            {
+                baseProduct.ProductImages.Add(new ProductImage()
+                {
+                    Product = baseProduct,
+                    Url = image,
+                });
+            }
+        }
+
+        protected override IApiRequest CreateApiRequest(ProductSearchViewModel productSearch)
+        {
+            return new AmazonRequest(productSearch);
         }
     }
 }

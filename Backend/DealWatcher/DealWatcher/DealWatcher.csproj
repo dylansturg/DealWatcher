@@ -356,13 +356,16 @@
     <Compile Include="Models\User.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="ProductSearch\IProductSource.cs" />
+    <Compile Include="ProductSearch\ProductSourceBase.cs" />
     <Compile Include="ProductSearch\ProductSearchException.cs" />
     <Compile Include="ProductSearch\ProductSearchService.cs" />
     <Compile Include="ProductSearch\ProductSource\AmazonProductSource.cs" />
     <Compile Include="ProductSearch\ProductSource\Amazon\AmazonRequest.cs" />
     <Compile Include="ProductSearch\ProductSource\Amazon\AmazonResponse.cs" />
     <Compile Include="ProductSearch\ProductSource\Amazon\RequestsHelper.cs" />
+    <Compile Include="ProductSearch\ProductSource\IApiProduct.cs" />
+    <Compile Include="ProductSearch\ProductSource\IApiRequest.cs" />
+    <Compile Include="ProductSearch\ProductSource\IApiResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />

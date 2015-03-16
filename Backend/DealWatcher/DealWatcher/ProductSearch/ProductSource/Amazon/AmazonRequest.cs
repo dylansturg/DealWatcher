@@ -9,7 +9,7 @@ using DealWatcher.Models;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    public class AmazonRequest
+    public class AmazonRequest : IApiRequest
     {
         public enum Operation
         {
@@ -18,7 +18,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         }
 
         private const string AmazonCodeType = "ASIN";
-        private const int AmazonMaxPages = 5;
+        private const int AmazonMaxPages = 3;
         private int MaxItemPages { get; set; }
 
         protected Operation RequestType { get; set; }
@@ -71,7 +71,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             MaxItemPages = 1;
         }
 
-        public async Task<IEnumerable<AmazonResponse>> ExecuteAsync()
+        public async Task<IEnumerable<IApiResponse>> ExecuteAsync()
         {
             var results = new AmazonResponse[MaxItemPages - Page];
             

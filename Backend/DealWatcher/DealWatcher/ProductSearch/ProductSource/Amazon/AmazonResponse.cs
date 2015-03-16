@@ -7,13 +7,12 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Text;
 using System.Linq;
-using System.Xml;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    public class AmazonResponse
+    public class AmazonResponse : IApiResponse
     {
-        public IEnumerable<AmazonProduct> ParsedResults { get; private set; }
+        public IEnumerable<IApiProduct> ParsedProducts { get; private set; }
         private AmazonRequest.Operation RequestType { get; set; }
 
         public AmazonResponse(AmazonRequest.Operation requestType)
@@ -54,7 +53,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
 
             if (items == null)
             {
-                ParsedResults = new List<AmazonProduct>();
+                ParsedProducts = new List<AmazonProduct>();
                 return;
             }
 
@@ -83,7 +82,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             
             var amazonProds = converted.Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
 
-            ParsedResults = amazonProds;
+            ParsedProducts = amazonProds;
         }
 
         private static double SelectItemPrice(Item item)
