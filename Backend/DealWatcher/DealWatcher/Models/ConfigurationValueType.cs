@@ -12,18 +12,19 @@ namespace DealWatcher.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class AspNetRole
+    public partial class ConfigurationValueType
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AspNetRole()
+        public ConfigurationValueType()
         {
-            this.AspNetUsers = new HashSet<AspNetUser>();
+            this.Configurations = new HashSet<Configuration>();
         }
     
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
+        public string Class { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
+        public virtual ICollection<Configuration> Configurations { get; set; }
     }
 }

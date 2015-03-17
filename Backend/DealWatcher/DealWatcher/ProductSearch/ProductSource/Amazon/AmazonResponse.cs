@@ -7,28 +7,42 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Text;
 using System.Linq;
-using System.Xml;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    public class AmazonResponse
+    public class AmazonResponse : IApiResponse
     {
-        public IEnumerable<AmazonProduct> ParsedResults { get; private set; }
+        public IEnumerable<IApiProduct> ParsedProducts { get; private set; }
+        private AmazonRequest.Operation RequestType { get; set; }
 
-        public AmazonResponse()
+        public AmazonResponse(AmazonRequest.Operation requestType)
         {
+            RequestType = requestType;
+        }
+
+        private XmlSerializer CreateSerializer()
+        {
+            switch (RequestType)
+            {
+                case AmazonRequest.Operation.ItemLookup:
+                    return new XmlSerializer(typeof(ItemLookupResponse));
+                case AmazonRequest.Operation.ItemSearch:
+                    return new XmlSerializer(typeof(ItemSearchResponse));
+                default:
+                    // Probably shouldn't let this happen, who knows what that's going to do
+                    return new XmlSerializer(typeof(void));
+            }
         }
 
         public async Task ParseResultsAsync(String xmlSource)
         {
-
             List<Item> items = null;
-            var serializer = new XmlSerializer(typeof(ItemSearchResponse));
+            var serializer = CreateSerializer();
             using (var xmlStream = StringStream(xmlSource))
             {
                 try
                 {
-                    var parsed = serializer.Deserialize(xmlStream) as ItemSearchResponse;
+                    var parsed = serializer.Deserialize(xmlStream) as IAmazonResult;
                     items = parsed != null ? (parsed.Items != null ? parsed.Items.Item : null) : null;
                 }
                 catch (Exception e)
@@ -39,11 +53,12 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
 
             if (items == null)
             {
-                ParsedResults = new List<AmazonProduct>();
+                ParsedProducts = new List<AmazonProduct>();
                 return;
             }
 
-            var amazonProds = items.Select<Item, AmazonProduct>(item =>
+            Exception parseFailure = null;
+            var converted = items.Select(item =>
             {
                 try
                 {
@@ -58,22 +73,26 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                         Price = SelectItemPrice(item),
                     };
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    parseFailure = e;
                     return null;
                 }
-            }).Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
+            });
+            
+            var amazonProds = converted.Where(prod => prod != null).Where(prod => prod.Price > 0 && !String.IsNullOrEmpty(prod.ASIN));
 
-            ParsedResults = amazonProds;
+            ParsedProducts = amazonProds;
         }
 
-        private double SelectItemPrice(Item item)
+        private static double SelectItemPrice(Item item)
         {
-            if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null)
+            if (item.OfferSummary != null && item.OfferSummary.LowestNewPrice != null && item.OfferSummary.LowestNewPrice.ListPriceAmount != null)
             {
                 return ParsePriceAmount(item.OfferSummary.LowestNewPrice.ListPriceAmount.Value.ToString());
             }
-            else if (item.ItemAttributes != null && item.ItemAttributes.ListPrice != null)
+            
+            if (item.ItemAttributes != null && item.ItemAttributes.ListPrice != null && item.ItemAttributes.ListPrice.ListPriceAmount != null)
             {
                 return ParsePriceAmount(item.ItemAttributes.ListPrice.ListPriceAmount.Value.ToString());
             }
@@ -93,7 +112,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             return Double.Parse(String.Format("{0}.{1}", digits, decimals));
         }
 
-        private HashSet<string> SelectItemImage(Item item)
+        private static IEnumerable<string> SelectItemImage(Item item)
         {
             var result = new HashSet<String>();
             if (item.ItemLargeImage != null && item.ItemLargeImage.ItemImageURL != null)
@@ -111,7 +130,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             return result;
         }
 
-        private Stream StringStream(String s)
+        private static Stream StringStream(String s)
         {
             return new MemoryStream(Encoding.UTF8.GetBytes(s ?? ""));
         }

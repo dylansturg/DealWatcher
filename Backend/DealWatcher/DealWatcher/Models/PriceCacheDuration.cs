@@ -12,17 +12,11 @@ namespace DealWatcher.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ProductPrice
+    public partial class PriceCacheDuration
     {
-        public int Id { get; set; }
-        public int ProductId { get; set; }
         public int SellerId { get; set; }
-        public System.DateTimeOffset Gathered { get; set; }
-        public string LocationUrl { get; set; }
-        public decimal Price { get; set; }
-        public bool Current { get; set; }
+        public System.TimeSpan CacheLifetime { get; set; }
     
-        public virtual Product Product { get; set; }
         public virtual Seller Seller { get; set; }
     }
 }

@@ -3,23 +3,26 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using DealWatcher.Models;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
-    public class AmazonRequest
+    public class AmazonRequest : IApiRequest
     {
-        protected enum Operation
+        public enum Operation
         {
             ItemLookup,
             ItemSearch,
         }
 
         private const string AmazonCodeType = "ASIN";
-        private const int MaxItemPages = 6;
+        private const int AmazonMaxPages = 3;
+        private int MaxItemPages { get; set; }
+
         protected Operation RequestType { get; set; }
-        protected int Page = 1;
+        protected int Page = 0;
 
         protected String ProductCode { get; set; }
         protected String ProductCodeType { get; set; }
@@ -57,6 +60,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         {
             RequestType = Operation.ItemSearch;
             ProductName = searchTerms;
+            MaxItemPages = AmazonMaxPages;
         }
 
         private void SetupItemLookup(String productCode, String codeType)
@@ -64,13 +68,14 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             RequestType = Operation.ItemLookup;
             ProductCode = productCode;
             ProductCodeType = codeType;
+            MaxItemPages = 1;
         }
 
-        public async Task<IEnumerable<AmazonResponse>> ExecuteAsync()
+        public async Task<IEnumerable<IApiResponse>> ExecuteAsync()
         {
-            var results = new ConcurrentBag<AmazonResponse>();
+            var results = new AmazonResponse[MaxItemPages - Page];
             
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(new AmazonRetryHandler()))
             {
                 var apiTasks = new List<Task>();
                 for (var i = Page; i < MaxItemPages; i++)
@@ -78,12 +83,20 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                     var request = GetRequestParameters();
                     var uri = RequestsHelper.Instance.SignRequest(request);
 
+                    var index = i;
                     apiTasks.Add(TaskEx.Run(async () =>
                     {
-                        var apiResponse = await client.GetStringAsync(uri);
-                        var response = new AmazonResponse();
-                        await response.ParseResultsAsync(apiResponse);
-                        results.Add(response);
+                        try
+                        {
+                            var apiResponse = await client.GetStringAsync(uri);
+                            var response = new AmazonResponse(RequestType);
+                            await response.ParseResultsAsync(apiResponse);
+                            results[index] = response;
+                        }
+                        catch (Exception httpException)
+                        {
+                            Console.WriteLine(httpException);
+                        }
                     }));
 
                     Page++;
@@ -97,12 +110,12 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         private Dictionary<String, String> GetRequestParameters()
         {
             var requestParams = new Dictionary<String, String>();
-            AppendSearchParams(requestParams);
             AppendDefaultParams(requestParams);
+            AppendSearchParams(requestParams);
             return requestParams;
         }
 
-        private void AppendSearchParams(Dictionary<String, String> request)
+        private void AppendSearchParams(IDictionary<String, String> request)
         {
             switch (RequestType)
             {
@@ -115,25 +128,55 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
             }
         }
 
-        private void ItemLookupParams(Dictionary<String, String> request)
+        private void ItemLookupParams(IDictionary<String, String> request)
         {
             request.Add("Operation", "ItemLookup");
             request.Add("ItemId", ProductCode);
             request.Add("IdType", ProductCodeType);
         }
 
-        private void ItemSearchParams(Dictionary<String, String> request)
+        private void ItemSearchParams(IDictionary<string, string> request)
         {
             request.Add("Operation", "ItemSearch");
             request.Add("Keywords", ProductName);
+            request.Add("SearchIndex", "All");
         }
 
-        private void AppendDefaultParams(Dictionary<String, String> request)
+        private void AppendDefaultParams(IDictionary<String, String> request)
         {
-            request.Add("SearchIndex", "Blended");
             request.Add("Availability", "Available");
             request.Add("ResponseGroup", "ItemAttributes,Images,OfferSummary");
-            request.Add("ItemPage", Page.ToString());
+            request.Add("ItemPage", (Page + 1).ToString());
+        }
+    }
+
+    class AmazonRetryHandler : HttpClientHandler
+    {
+        private const int BackoffMultiplier = 1000;
+        public int Retries { get; set; }
+        public int Backoff { get; set; }
+
+        
+        public AmazonRetryHandler(int retries = 2, int backoff = 1)
+        {
+            Retries = retries;
+            Backoff = backoff;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            HttpResponseMessage response = null;
+            for (var i = 0; i < Retries; i++)
+            {
+                response = await base.SendAsync(request, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    return response;
+                }
+
+                Thread.Sleep(TimeSpan.FromMilliseconds(Backoff*BackoffMultiplier*Math.Pow(2, i)));
+            }
+            return response;
         }
     }
 }
