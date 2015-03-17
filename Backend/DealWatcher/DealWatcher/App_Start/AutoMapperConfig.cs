@@ -41,6 +41,8 @@ namespace DealWatcher
                     Value = convertedValue
                 };
             });
+
+            Mapper.CreateMap<Seller, SellerViewModel>();
         }
     }
 }
