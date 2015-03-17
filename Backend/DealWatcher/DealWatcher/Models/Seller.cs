@@ -26,9 +26,9 @@ namespace DealWatcher.Models
         public string Website { get; set; }
         public string PriceSource { get; set; }
     
+        public virtual PriceCacheDuration PriceCacheDuration { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductCodeType> ProductCodeTypes { get; set; }
-        public virtual PriceCacheDuration PriceCacheDuration { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductPrice> ProductPrices { get; set; }
     }

@@ -15,7 +15,7 @@ namespace DealWatcher.Models
     public partial class PriceCacheDuration
     {
         public int SellerId { get; set; }
-        public System.TimeSpan CacheLifetime { get; set; }
+        public System.TimeSpan CacheLifetme { get; set; }
     
         public virtual Seller Seller { get; set; }
     }

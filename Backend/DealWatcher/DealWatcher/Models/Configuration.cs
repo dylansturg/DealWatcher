@@ -14,10 +14,10 @@ namespace DealWatcher.Models
     
     public partial class Configuration
     {
-        public int Id { get; set; }
         public string Key { get; set; }
         public int TypeId { get; set; }
         public byte[] Value { get; set; }
+        public int Id { get; set; }
     
         public virtual ConfigurationValueType ConfigurationValueType { get; set; }
     }

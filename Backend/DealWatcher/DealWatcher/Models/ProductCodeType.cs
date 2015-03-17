@@ -24,8 +24,8 @@ namespace DealWatcher.Models
         public string Type { get; set; }
         public Nullable<int> ProprietarySellerId { get; set; }
     
-        public virtual Seller Seller { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductCode> ProductCodes { get; set; }
+        public virtual Seller Seller { get; set; }
     }
 }

@@ -356,6 +356,9 @@
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SellerViewModel.cs" />
+    <Compile Include="Models\TrackedProduct.cs">
+      <DependentUpon>DealWatcherModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\User.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>

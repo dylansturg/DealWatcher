@@ -5,16 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="DealWatcherService_dbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
-          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
-          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
-          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
-        </EntityType>
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -70,10 +60,10 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Key" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="TypeId" Type="int" Nullable="false" />
           <Property Name="Value" Type="varbinary(max)" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="ConfigurationValueTypes">
           <Key>
@@ -88,7 +78,7 @@
             <PropertyRef Name="SellerId" />
           </Key>
           <Property Name="SellerId" Type="int" Nullable="false" />
-          <Property Name="CacheLifetime" Type="time" Precision="7" Nullable="false" />
+          <Property Name="CacheLifetme" Type="time" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="ProductCodes">
           <Key>
@@ -152,6 +142,16 @@
           <Property Name="Website" Type="nvarchar(max)" Nullable="false" />
           <Property Name="PriceSource" Type="nvarchar" MaxLength="255" Nullable="false" />
         </EntityType>
+        <EntityType Name="TrackedProducts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="StartedTracking" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="StoppedTracking" Type="datetimeoffset" Precision="7" />
+        </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="Id" />
@@ -162,6 +162,54 @@
           <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
           <Property Name="LastName" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK_AspNetUserClaims_0">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="AspNetUserClaims" Type="Self.AspNetUserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserClaims">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AspNetUserLogins_0">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="AspNetUserLogins" Type="Self.AspNetUserLogins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserLogins">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AspNetUserRoles_0">
+          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1" />
+          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetRoles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserRoles">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AspNetUserRoles_1">
+          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1" />
+          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetRoles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Configurations_0">
           <End Role="ConfigurationValueTypes" Type="Self.ConfigurationValueTypes" Multiplicity="1" />
           <End Role="Configurations" Type="Self.Configurations" Multiplicity="*" />
@@ -174,64 +222,10 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserClaims" Type="Self.AspNetUserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserClaims">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserLogins" Type="Self.AspNetUserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserLogins">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
-          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetRoles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PriceCacheDurations_0">
-          <End Role="Sellers" Type="Self.Sellers" Multiplicity="1" />
+          <End Role="Sellers" Type="Self.Sellers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="PriceCacheDurations" Type="Self.PriceCacheDurations" Multiplicity="0..1" />
           <ReferentialConstraint>
             <Principal Role="Sellers">
@@ -255,7 +249,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductCodes_1">
-          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="Products" Type="Self.Products" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="ProductCodes" Type="Self.ProductCodes" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Products">
@@ -279,7 +275,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductImages_0">
-          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="Products" Type="Self.Products" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="ProductImages" Type="Self.ProductImages" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Products">
@@ -291,7 +289,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductPrices_0">
-          <End Role="Products" Type="Self.Products" Multiplicity="1" />
+          <End Role="Products" Type="Self.Products" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="ProductPrices" Type="Self.ProductPrices" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Products">
@@ -314,6 +314,34 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_TrackedProducts_0">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TrackedProducts" Type="Self.TrackedProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TrackedProducts">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TrackedProducts_1">
+          <End Role="Products" Type="Self.Products" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TrackedProducts" Type="Self.TrackedProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Products">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TrackedProducts">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Users_0">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -329,7 +357,6 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="DealWatcherService_dbModelStoreContainer">
-          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
@@ -345,26 +372,27 @@
           <EntitySet Name="Products" EntityType="Self.Products" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RegistrationTokens" EntityType="Self.RegistrationTokens" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sellers" EntityType="Self.Sellers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TrackedProducts" EntityType="Self.TrackedProducts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_Configurations_0" Association="Self.FK_Configurations_0">
-            <End Role="ConfigurationValueTypes" EntitySet="ConfigurationValueTypes" />
-            <End Role="Configurations" EntitySet="Configurations" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
+          <AssociationSet Name="FK_AspNetUserClaims_0" Association="Self.FK_AspNetUserClaims_0">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
+          <AssociationSet Name="FK_AspNetUserLogins_0" Association="Self.FK_AspNetUserLogins_0">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
+          <AssociationSet Name="FK_AspNetUserRoles_0" Association="Self.FK_AspNetUserRoles_0">
             <End Role="AspNetRoles" EntitySet="AspNetRoles" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+          <AssociationSet Name="FK_AspNetUserRoles_1" Association="Self.FK_AspNetUserRoles_1">
+            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Configurations_0" Association="Self.FK_Configurations_0">
+            <End Role="ConfigurationValueTypes" EntitySet="ConfigurationValueTypes" />
+            <End Role="Configurations" EntitySet="Configurations" />
           </AssociationSet>
           <AssociationSet Name="FK_PriceCacheDurations_0" Association="Self.FK_PriceCacheDurations_0">
             <End Role="Sellers" EntitySet="Sellers" />
@@ -394,6 +422,14 @@
             <End Role="Sellers" EntitySet="Sellers" />
             <End Role="ProductPrices" EntitySet="ProductPrices" />
           </AssociationSet>
+          <AssociationSet Name="FK_TrackedProducts_0" Association="Self.FK_TrackedProducts_0">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="TrackedProducts" EntitySet="TrackedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TrackedProducts_1" Association="Self.FK_TrackedProducts_1">
+            <End Role="Products" EntitySet="Products" />
+            <End Role="TrackedProducts" EntitySet="TrackedProducts" />
+          </AssociationSet>
           <AssociationSet Name="FK_Users_0" Association="Self.FK_Users_0">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="Users" EntitySet="Users" />
@@ -404,28 +440,49 @@
     <edmx:ConceptualModels>
       <Schema Namespace="DealWatcherService_dbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="DealWatcherService_dbEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="C__MigrationHistory" EntityType="DealWatcherService_dbModel.C__MigrationHistory" />
           <EntitySet Name="AspNetRoles" EntityType="DealWatcherService_dbModel.AspNetRole" />
           <EntitySet Name="AspNetUserClaims" EntityType="DealWatcherService_dbModel.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="DealWatcherService_dbModel.AspNetUserLogin" />
           <EntitySet Name="AspNetUsers" EntityType="DealWatcherService_dbModel.AspNetUser" />
+          <EntitySet Name="Configurations" EntityType="DealWatcherService_dbModel.Configuration" />
+          <EntitySet Name="ConfigurationValueTypes" EntityType="DealWatcherService_dbModel.ConfigurationValueType" />
+          <EntitySet Name="PriceCacheDurations" EntityType="DealWatcherService_dbModel.PriceCacheDuration" />
+          <EntitySet Name="ProductCodes" EntityType="DealWatcherService_dbModel.ProductCode" />
           <EntitySet Name="ProductCodeTypes" EntityType="DealWatcherService_dbModel.ProductCodeType" />
           <EntitySet Name="ProductImages" EntityType="DealWatcherService_dbModel.ProductImage" />
+          <EntitySet Name="ProductPrices" EntityType="DealWatcherService_dbModel.ProductPrice" />
           <EntitySet Name="Products" EntityType="DealWatcherService_dbModel.Product" />
           <EntitySet Name="RegistrationTokens" EntityType="DealWatcherService_dbModel.RegistrationToken" />
           <EntitySet Name="Sellers" EntityType="DealWatcherService_dbModel.Seller" />
+          <EntitySet Name="TrackedProducts" EntityType="DealWatcherService_dbModel.TrackedProduct" />
           <EntitySet Name="Users" EntityType="DealWatcherService_dbModel.User" />
-          <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="DealWatcherService_dbModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
+          <AssociationSet Name="FK_AspNetUserClaims_0" Association="DealWatcherService_dbModel.FK_AspNetUserClaims_0">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaim" EntitySet="AspNetUserClaims" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="DealWatcherService_dbModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
+          <AssociationSet Name="FK_AspNetUserLogins_0" Association="DealWatcherService_dbModel.FK_AspNetUserLogins_0">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="AspNetUserLogin" EntitySet="AspNetUserLogins" />
           </AssociationSet>
           <AssociationSet Name="FK_Users_0" Association="DealWatcherService_dbModel.FK_Users_0">
             <End Role="AspNetUser" EntitySet="AspNetUsers" />
             <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Configurations_0" Association="DealWatcherService_dbModel.FK_Configurations_0">
+            <End Role="ConfigurationValueType" EntitySet="ConfigurationValueTypes" />
+            <End Role="Configuration" EntitySet="Configurations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PriceCacheDurations_0" Association="DealWatcherService_dbModel.FK_PriceCacheDurations_0">
+            <End Role="Seller" EntitySet="Sellers" />
+            <End Role="PriceCacheDuration" EntitySet="PriceCacheDurations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_0" Association="DealWatcherService_dbModel.FK_ProductCodes_0">
+            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductCodes_1" Association="DealWatcherService_dbModel.FK_ProductCodes_1">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductCode" EntitySet="ProductCodes" />
           </AssociationSet>
           <AssociationSet Name="FK_ProductCodeTypes_0" Association="DealWatcherService_dbModel.FK_ProductCodeTypes_0">
             <End Role="Seller" EntitySet="Sellers" />
@@ -435,25 +492,6 @@
             <End Role="Product" EntitySet="Products" />
             <End Role="ProductImage" EntitySet="ProductImages" />
           </AssociationSet>
-          <AssociationSet Name="AspNetUserRoles" Association="DealWatcherService_dbModel.AspNetUserRoles">
-            <End Role="AspNetRole" EntitySet="AspNetRoles" />
-            <End Role="AspNetUser" EntitySet="AspNetUsers" />
-          </AssociationSet>
-          <EntitySet Name="ProductCodes" EntityType="DealWatcherService_dbModel.ProductCode" />
-          <AssociationSet Name="FK_ProductCodes_0" Association="DealWatcherService_dbModel.FK_ProductCodes_0">
-            <End Role="ProductCodeType" EntitySet="ProductCodeTypes" />
-            <End Role="ProductCode" EntitySet="ProductCodes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProductCodes_1" Association="DealWatcherService_dbModel.FK_ProductCodes_1">
-            <End Role="Product" EntitySet="Products" />
-            <End Role="ProductCode" EntitySet="ProductCodes" />
-          </AssociationSet>
-          <EntitySet Name="PriceCacheDurations" EntityType="DealWatcherService_dbModel.PriceCacheDuration" />
-          <AssociationSet Name="FK_PriceCacheDurations_0" Association="DealWatcherService_dbModel.FK_PriceCacheDurations_0">
-            <End Role="Seller" EntitySet="Sellers" />
-            <End Role="PriceCacheDuration" EntitySet="PriceCacheDurations" />
-          </AssociationSet>
-          <EntitySet Name="ProductPrices" EntityType="DealWatcherService_dbModel.ProductPrice" />
           <AssociationSet Name="FK_ProductPrices_0" Association="DealWatcherService_dbModel.FK_ProductPrices_0">
             <End Role="Product" EntitySet="Products" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
@@ -462,30 +500,27 @@
             <End Role="Seller" EntitySet="Sellers" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
           </AssociationSet>
-          <EntitySet Name="Configurations" EntityType="DealWatcherService_dbModel.Configuration" />
-          <EntitySet Name="ConfigurationValueTypes" EntityType="DealWatcherService_dbModel.ConfigurationValueType" />
-          <AssociationSet Name="FK_Configurations_0" Association="DealWatcherService_dbModel.FK_Configurations_0">
-            <End Role="ConfigurationValueType" EntitySet="ConfigurationValueTypes" />
-            <End Role="Configuration" EntitySet="Configurations" />
+          <AssociationSet Name="FK_TrackedProducts_1" Association="DealWatcherService_dbModel.FK_TrackedProducts_1">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="TrackedProduct" EntitySet="TrackedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TrackedProducts_0" Association="DealWatcherService_dbModel.FK_TrackedProducts_0">
+            <End Role="User" EntitySet="Users" />
+            <End Role="TrackedProduct" EntitySet="TrackedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="AspNetUserRoles" Association="DealWatcherService_dbModel.AspNetUserRoles">
+            <End Role="AspNetRole" EntitySet="AspNetRoles" />
+            <End Role="AspNetRole1" EntitySet="AspNetRoles" />
           </AssociationSet>
         </EntityContainer>
-        <EntityType Name="C__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
-          <Property Name="ContextKey" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
-          <Property Name="Model" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
-          <Property Name="ProductVersion" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="AspNetRole">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AspNetUsers" Relationship="DealWatcherService_dbModel.AspNetUserRoles" FromRole="AspNetRole" ToRole="AspNetUser" />
+          <NavigationProperty Name="AspNetRoles1" Relationship="DealWatcherService_dbModel.AspNetUserRoles" FromRole="AspNetRole" ToRole="AspNetRole1" />
+          <NavigationProperty Name="AspNetRoles" Relationship="DealWatcherService_dbModel.AspNetUserRoles" FromRole="AspNetRole1" ToRole="AspNetRole" />
         </EntityType>
         <EntityType Name="AspNetUserClaim">
           <Key>
@@ -495,7 +530,7 @@
           <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ClaimType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="ClaimValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUserClaim" ToRole="AspNetUser" />
+          <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_AspNetUserClaims_0" FromRole="AspNetUserClaim" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="AspNetUserLogin">
           <Key>
@@ -506,7 +541,7 @@
           <Property Name="LoginProvider" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="ProviderKey" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUserLogin" ToRole="AspNetUser" />
+          <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_AspNetUserLogins_0" FromRole="AspNetUserLogin" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="AspNetUser">
           <Key>
@@ -524,10 +559,47 @@
           <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AspNetUserClaims" Relationship="DealWatcherService_dbModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserClaim" />
-          <NavigationProperty Name="AspNetUserLogins" Relationship="DealWatcherService_dbModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
+          <NavigationProperty Name="AspNetUserClaims" Relationship="DealWatcherService_dbModel.FK_AspNetUserClaims_0" FromRole="AspNetUser" ToRole="AspNetUserClaim" />
+          <NavigationProperty Name="AspNetUserLogins" Relationship="DealWatcherService_dbModel.FK_AspNetUserLogins_0" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
           <NavigationProperty Name="Users" Relationship="DealWatcherService_dbModel.FK_Users_0" FromRole="AspNetUser" ToRole="User" />
-          <NavigationProperty Name="AspNetRoles" Relationship="DealWatcherService_dbModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
+        </EntityType>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Key" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="Value" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="ConfigurationValueType" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="Configuration" ToRole="ConfigurationValueType" />
+        </EntityType>
+        <EntityType Name="ConfigurationValueType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Class" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Configurations" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="ConfigurationValueType" ToRole="Configuration" />
+        </EntityType>
+        <EntityType Name="PriceCacheDuration">
+          <Key>
+            <PropertyRef Name="SellerId" />
+          </Key>
+          <Property Name="SellerId" Type="Int32" Nullable="false" />
+          <Property Name="CacheLifetme" Type="Time" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_PriceCacheDurations_0" FromRole="PriceCacheDuration" ToRole="Seller" />
+        </EntityType>
+        <EntityType Name="ProductCode">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="ProductCodeType" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCode" ToRole="ProductCodeType" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="ProductCode" ToRole="Product" />
         </EntityType>
         <EntityType Name="ProductCodeType">
           <Key>
@@ -536,8 +608,8 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ProprietarySellerId" Type="Int32" />
-          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="ProductCodeType" ToRole="Seller" />
           <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCodeType" ToRole="ProductCode" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="ProductCodeType" ToRole="Seller" />
         </EntityType>
         <EntityType Name="ProductImage">
           <Key>
@@ -548,15 +620,30 @@
           <Property Name="Url" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="ProductImage" ToRole="Product" />
         </EntityType>
+        <EntityType Name="ProductPrice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="SellerId" Type="Int32" Nullable="false" />
+          <Property Name="Gathered" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="LocationUrl" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="Current" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="ProductPrice" ToRole="Product" />
+          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="ProductPrice" ToRole="Seller" />
+        </EntityType>
         <EntityType Name="Product">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ProductImages" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="Product" ToRole="ProductImage" />
           <NavigationProperty Name="ProductCodes" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="Product" ToRole="ProductCode" />
+          <NavigationProperty Name="ProductImages" Relationship="DealWatcherService_dbModel.FK_ProductImages_0" FromRole="Product" ToRole="ProductImage" />
           <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="Product" ToRole="ProductPrice" />
+          <NavigationProperty Name="TrackedProducts" Relationship="DealWatcherService_dbModel.FK_TrackedProducts_1" FromRole="Product" ToRole="TrackedProduct" />
         </EntityType>
         <EntityType Name="RegistrationToken">
           <Key>
@@ -575,9 +662,21 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Website" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PriceSource" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ProductCodeTypes" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="Seller" ToRole="ProductCodeType" />
           <NavigationProperty Name="PriceCacheDuration" Relationship="DealWatcherService_dbModel.FK_PriceCacheDurations_0" FromRole="Seller" ToRole="PriceCacheDuration" />
+          <NavigationProperty Name="ProductCodeTypes" Relationship="DealWatcherService_dbModel.FK_ProductCodeTypes_0" FromRole="Seller" ToRole="ProductCodeType" />
           <NavigationProperty Name="ProductPrices" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="Seller" ToRole="ProductPrice" />
+        </EntityType>
+        <EntityType Name="TrackedProduct">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="StartedTracking" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="StoppedTracking" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_TrackedProducts_1" FromRole="TrackedProduct" ToRole="Product" />
+          <NavigationProperty Name="User" Relationship="DealWatcherService_dbModel.FK_TrackedProducts_0" FromRole="TrackedProduct" ToRole="User" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -589,11 +688,10 @@
           <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AspNetUser" Relationship="DealWatcherService_dbModel.FK_Users_0" FromRole="User" ToRole="AspNetUser" />
+          <NavigationProperty Name="TrackedProducts" Relationship="DealWatcherService_dbModel.FK_TrackedProducts_0" FromRole="User" ToRole="TrackedProduct" />
         </EntityType>
-        <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
-          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+        <Association Name="FK_AspNetUserClaims_0">
+          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
           <End Type="DealWatcherService_dbModel.AspNetUserClaim" Role="AspNetUserClaim" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUser">
@@ -604,10 +702,8 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+        <Association Name="FK_AspNetUserLogins_0">
+          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
           <End Type="DealWatcherService_dbModel.AspNetUserLogin" Role="AspNetUserLogin" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUser">
@@ -632,45 +728,32 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProductCodeTypes_0">
-          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="0..1" />
-          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="*" />
+        <Association Name="FK_Configurations_0">
+          <End Type="DealWatcherService_dbModel.ConfigurationValueType" Role="ConfigurationValueType" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.Configuration" Role="Configuration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ConfigurationValueType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Configuration">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PriceCacheDurations_0">
+          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DealWatcherService_dbModel.PriceCacheDuration" Role="PriceCacheDuration" Multiplicity="0..1" />
           <ReferentialConstraint>
             <Principal Role="Seller">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ProductCodeType">
-              <PropertyRef Name="ProprietarySellerId" />
+            <Dependent Role="PriceCacheDuration">
+              <PropertyRef Name="SellerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProductImages_0">
-          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
-          <End Type="DealWatcherService_dbModel.ProductImage" Role="ProductImage" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ProductImage">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="AspNetUserRoles">
-          <End Type="DealWatcherService_dbModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
-          <End Type="DealWatcherService_dbModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
-        </Association>
-        <EntityType Name="ProductCode">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="TypeId" Type="Int32" Nullable="false" />
-          <Property Name="ProductId" Type="Int32" Nullable="false" />
-          <Property Name="Code" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="ProductCodeType" Relationship="DealWatcherService_dbModel.FK_ProductCodes_0" FromRole="ProductCode" ToRole="ProductCodeType" />
-          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductCodes_1" FromRole="ProductCode" ToRole="Product" />
-        </EntityType>
         <Association Name="FK_ProductCodes_0">
           <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="1" />
           <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
@@ -684,7 +767,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductCodes_1">
-          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="DealWatcherService_dbModel.ProductCode" Role="ProductCode" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -695,42 +780,36 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="PriceCacheDuration">
-          <Key>
-            <PropertyRef Name="SellerId" />
-          </Key>
-          <Property Name="SellerId" Type="Int32" Nullable="false" />
-          <Property Name="CacheLifetime" Type="Time" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_PriceCacheDurations_0" FromRole="PriceCacheDuration" ToRole="Seller" />
-        </EntityType>
-        <Association Name="FK_PriceCacheDurations_0">
-          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="1" />
-          <End Type="DealWatcherService_dbModel.PriceCacheDuration" Role="PriceCacheDuration" Multiplicity="0..1" />
+        <Association Name="FK_ProductCodeTypes_0">
+          <End Type="DealWatcherService_dbModel.Seller" Role="Seller" Multiplicity="0..1" />
+          <End Type="DealWatcherService_dbModel.ProductCodeType" Role="ProductCodeType" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Seller">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="PriceCacheDuration">
-              <PropertyRef Name="SellerId" />
+            <Dependent Role="ProductCodeType">
+              <PropertyRef Name="ProprietarySellerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="ProductPrice">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ProductId" Type="Int32" Nullable="false" />
-          <Property Name="SellerId" Type="Int32" Nullable="false" />
-          <Property Name="Gathered" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LocationUrl" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Price" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="Current" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Product" Relationship="DealWatcherService_dbModel.FK_ProductPrices_0" FromRole="ProductPrice" ToRole="Product" />
-          <NavigationProperty Name="Seller" Relationship="DealWatcherService_dbModel.FK_ProductPrices_1" FromRole="ProductPrice" ToRole="Seller" />
-        </EntityType>
+        <Association Name="FK_ProductImages_0">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DealWatcherService_dbModel.ProductImage" Role="ProductImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductImage">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ProductPrices_0">
-          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="DealWatcherService_dbModel.ProductPrice" Role="ProductPrice" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Product">
@@ -753,36 +832,37 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Configuration">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Key" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="TypeId" Type="Int32" Nullable="false" />
-          <Property Name="Value" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
-          <NavigationProperty Name="ConfigurationValueType" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="Configuration" ToRole="ConfigurationValueType" />
-        </EntityType>
-        <EntityType Name="ConfigurationValueType">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Class" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Configurations" Relationship="DealWatcherService_dbModel.FK_Configurations_0" FromRole="ConfigurationValueType" ToRole="Configuration" />
-        </EntityType>
-        <Association Name="FK_Configurations_0">
-          <End Type="DealWatcherService_dbModel.ConfigurationValueType" Role="ConfigurationValueType" Multiplicity="1" />
-          <End Type="DealWatcherService_dbModel.Configuration" Role="Configuration" Multiplicity="*" />
+        <Association Name="FK_TrackedProducts_1">
+          <End Type="DealWatcherService_dbModel.Product" Role="Product" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DealWatcherService_dbModel.TrackedProduct" Role="TrackedProduct" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ConfigurationValueType">
+            <Principal Role="Product">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Configuration">
-              <PropertyRef Name="TypeId" />
+            <Dependent Role="TrackedProduct">
+              <PropertyRef Name="ProductId" />
             </Dependent>
           </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TrackedProducts_0">
+          <End Type="DealWatcherService_dbModel.User" Role="User" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DealWatcherService_dbModel.TrackedProduct" Role="TrackedProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TrackedProduct">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="AspNetUserRoles">
+          <End Type="DealWatcherService_dbModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
+          <End Type="DealWatcherService_dbModel.AspNetRole" Role="AspNetRole1" Multiplicity="*" />
         </Association>
         </Schema>
     </edmx:ConceptualModels>
@@ -790,16 +870,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="DealWatcherService_dbModelStoreContainer" CdmEntityContainer="DealWatcherService_dbEntities">
-          <EntitySetMapping Name="C__MigrationHistory">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.C__MigrationHistory">
-              <MappingFragment StoreEntitySet="__MigrationHistory">
-                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
-                <ScalarProperty Name="Model" ColumnName="Model" />
-                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
-                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
@@ -845,6 +915,43 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Configurations">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.Configuration">
+              <MappingFragment StoreEntitySet="Configurations">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+                <ScalarProperty Name="Key" ColumnName="Key" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ConfigurationValueTypes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ConfigurationValueType">
+              <MappingFragment StoreEntitySet="ConfigurationValueTypes">
+                <ScalarProperty Name="Class" ColumnName="Class" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PriceCacheDurations">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.PriceCacheDuration">
+              <MappingFragment StoreEntitySet="PriceCacheDurations">
+                <ScalarProperty Name="CacheLifetme" ColumnName="CacheLifetme" />
+                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductCodes">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCode">
+              <MappingFragment StoreEntitySet="ProductCodes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="ProductCodeTypes">
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCodeType">
               <MappingFragment StoreEntitySet="ProductCodeTypes">
@@ -858,6 +965,19 @@
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductImage">
               <MappingFragment StoreEntitySet="ProductImages">
                 <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductPrices">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductPrice">
+              <MappingFragment StoreEntitySet="ProductPrices">
+                <ScalarProperty Name="Current" ColumnName="Current" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="LocationUrl" ColumnName="LocationUrl" />
+                <ScalarProperty Name="Gathered" ColumnName="Gathered" />
+                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
@@ -891,6 +1011,17 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="TrackedProducts">
+            <EntityTypeMapping TypeName="DealWatcherService_dbModel.TrackedProduct">
+              <MappingFragment StoreEntitySet="TrackedProducts">
+                <ScalarProperty Name="StoppedTracking" ColumnName="StoppedTracking" />
+                <ScalarProperty Name="StartedTracking" ColumnName="StartedTracking" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="DealWatcherService_dbModel.User">
               <MappingFragment StoreEntitySet="Users">
@@ -903,63 +1034,13 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <AssociationSetMapping Name="AspNetUserRoles" TypeName="DealWatcherService_dbModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
-            <EndProperty Name="AspNetUser">
-              <ScalarProperty Name="Id" ColumnName="UserId" />
-            </EndProperty>
-            <EndProperty Name="AspNetRole">
+            <EndProperty Name="AspNetRole1">
               <ScalarProperty Name="Id" ColumnName="RoleId" />
             </EndProperty>
+            <EndProperty Name="AspNetRole">
+              <ScalarProperty Name="Id" ColumnName="UserId" />
+            </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="ProductCodes">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductCode">
-              <MappingFragment StoreEntitySet="ProductCodes">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PriceCacheDurations">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.PriceCacheDuration">
-              <MappingFragment StoreEntitySet="PriceCacheDurations">
-                <ScalarProperty Name="CacheLifetime" ColumnName="CacheLifetime" />
-                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ProductPrices">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ProductPrice">
-              <MappingFragment StoreEntitySet="ProductPrices">
-                <ScalarProperty Name="Current" ColumnName="Current" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="LocationUrl" ColumnName="LocationUrl" />
-                <ScalarProperty Name="Gathered" ColumnName="Gathered" />
-                <ScalarProperty Name="SellerId" ColumnName="SellerId" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Configurations">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.Configuration">
-              <MappingFragment StoreEntitySet="Configurations">
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
-                <ScalarProperty Name="Key" ColumnName="Key" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ConfigurationValueTypes">
-            <EntityTypeMapping TypeName="DealWatcherService_dbModel.ConfigurationValueType">
-              <MappingFragment StoreEntitySet="ConfigurationValueTypes">
-                <ScalarProperty Name="Class" ColumnName="Class" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
