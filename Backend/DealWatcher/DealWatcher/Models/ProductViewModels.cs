@@ -49,6 +49,7 @@ namespace DealWatcher.Models
 
     public class ProductCodeViewModel
     {
+        public int Id { get; set; }
         public int TypeId { get; set; }
         public string Type { get; set; }
         public int ProductId { get; set; }
