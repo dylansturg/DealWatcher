@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface TrackedItemCell : UITableViewCell
-@property (weak, nonatomic) IBOutlet UIImageView *image;
 @property (weak, nonatomic) IBOutlet UILabel *title;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subtitle;
+@property (weak, nonatomic) IBOutlet UILabel *subtitle;
+@property (weak, nonatomic) IBOutlet UIImageView *productImage;
+
 
 @end

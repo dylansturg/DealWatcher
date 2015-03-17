@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5864056A1AB7FB8700E49066 /* DealWatcherData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 586405681AB7FB8700E49066 /* DealWatcherData.xcdatamodeld */; };
+		586405821AB8132100E49066 /* Product.m in Sources */ = {isa = PBXBuildFile; fileRef = 586405811AB8132100E49066 /* Product.m */; };
+		586405851AB8132200E49066 /* ProductImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 586405841AB8132200E49066 /* ProductImage.m */; };
+		586405881AB8132200E49066 /* ProductPrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 586405871AB8132200E49066 /* ProductPrice.m */; };
+		5864058B1AB8132200E49066 /* ProductCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 5864058A1AB8132200E49066 /* ProductCode.m */; };
+		5864058E1AB8132200E49066 /* Seller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5864058D1AB8132200E49066 /* Seller.m */; };
 		589B53451AB76F2500E0F161 /* TrackedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 589B53441AB76F2500E0F161 /* TrackedItemsViewController.m */; };
 		589B53481AB7CCFA00E0F161 /* TrackedItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 589B53471AB7CCFA00E0F161 /* TrackedItemCell.m */; };
 		58CFF3EF1AB7391E003961BE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 58CFF3EE1AB7391E003961BE /* main.m */; };
@@ -29,6 +35,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		586405691AB7FB8700E49066 /* DealWatcherData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DealWatcherData.xcdatamodel; sourceTree = "<group>"; };
+		586405801AB8132100E49066 /* Product.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Product.h; sourceTree = "<group>"; };
+		586405811AB8132100E49066 /* Product.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Product.m; sourceTree = "<group>"; };
+		586405831AB8132200E49066 /* ProductImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductImage.h; sourceTree = "<group>"; };
+		586405841AB8132200E49066 /* ProductImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductImage.m; sourceTree = "<group>"; };
+		586405861AB8132200E49066 /* ProductPrice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductPrice.h; sourceTree = "<group>"; };
+		586405871AB8132200E49066 /* ProductPrice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductPrice.m; sourceTree = "<group>"; };
+		586405891AB8132200E49066 /* ProductCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCode.h; sourceTree = "<group>"; };
+		5864058A1AB8132200E49066 /* ProductCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCode.m; sourceTree = "<group>"; };
+		5864058C1AB8132200E49066 /* Seller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Seller.h; sourceTree = "<group>"; };
+		5864058D1AB8132200E49066 /* Seller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Seller.m; sourceTree = "<group>"; };
 		589B53431AB76F2500E0F161 /* TrackedItemsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackedItemsViewController.h; sourceTree = "<group>"; };
 		589B53441AB76F2500E0F161 /* TrackedItemsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackedItemsViewController.m; sourceTree = "<group>"; };
 		589B53461AB7CCFA00E0F161 /* TrackedItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackedItemCell.h; sourceTree = "<group>"; };
@@ -80,6 +97,17 @@
 		5893D4741AB7E413002B1152 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				586405681AB7FB8700E49066 /* DealWatcherData.xcdatamodeld */,
+				5864058C1AB8132200E49066 /* Seller.h */,
+				5864058D1AB8132200E49066 /* Seller.m */,
+				586405891AB8132200E49066 /* ProductCode.h */,
+				5864058A1AB8132200E49066 /* ProductCode.m */,
+				586405861AB8132200E49066 /* ProductPrice.h */,
+				586405871AB8132200E49066 /* ProductPrice.m */,
+				586405831AB8132200E49066 /* ProductImage.h */,
+				586405841AB8132200E49066 /* ProductImage.m */,
+				586405801AB8132100E49066 /* Product.h */,
+				586405811AB8132100E49066 /* Product.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -293,7 +321,13 @@
 			files = (
 				58CFF3F21AB7391E003961BE /* AppDelegate.m in Sources */,
 				589B53481AB7CCFA00E0F161 /* TrackedItemCell.m in Sources */,
+				5864058B1AB8132200E49066 /* ProductCode.m in Sources */,
+				5864056A1AB7FB8700E49066 /* DealWatcherData.xcdatamodeld in Sources */,
+				5864058E1AB8132200E49066 /* Seller.m in Sources */,
+				586405821AB8132100E49066 /* Product.m in Sources */,
 				58CFF3EF1AB7391E003961BE /* main.m in Sources */,
+				586405881AB8132200E49066 /* ProductPrice.m in Sources */,
+				586405851AB8132200E49066 /* ProductImage.m in Sources */,
 				589B53451AB76F2500E0F161 /* TrackedItemsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -513,6 +547,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		586405681AB7FB8700E49066 /* DealWatcherData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				586405691AB7FB8700E49066 /* DealWatcherData.xcdatamodel */,
+			);
+			currentVersion = 586405691AB7FB8700E49066 /* DealWatcherData.xcdatamodel */;
+			path = DealWatcherData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 58CFF3E11AB7391E003961BE /* Project object */;
 }

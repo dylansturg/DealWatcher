@@ -7,11 +7,16 @@
 //
 
 #import "TrackedItemsViewController.h"
+#import "Product.h"
+#import "ProductImage.h"
+#import "TrackedItemCell.h"
+
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <RestKit.h>
 
 @interface TrackedItemsViewController ()
-{
-    NSString* CellIdenitifer;
-}
+@property (nonatomic, strong) NSArray* products;
+@property (nonatomic, copy) NSString* cellIdentifier;
 @end
 
 @implementation TrackedItemsViewController
@@ -24,9 +29,12 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    CellIdenitifer = @"TrackedItemCell";
+    _cellIdentifier = @"TrackedItemCell";
     
     [self tableView].rowHeight = 60.0f;
+    
+    //[self loadTrackedItems];
+    [self fetchTrackedItemsFromContext];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -38,51 +46,61 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 1;
+    return [self.products count];
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdenitifer forIndexPath:indexPath];
+    
+    TrackedItemCell *cell = [tableView dequeueReusableCellWithIdentifier:_cellIdentifier forIndexPath:indexPath];
     
     // Configure the cell...
+    NSInteger index = indexPath.row;
+    if ([self.products count] > index) {
+        Product *product = self.products[index];
+        cell.title.text = product.displayName;
+        if (product.productImages.count > 0) {
+            ProductImage *image = (ProductImage*)[product.productImages anyObject];
+            NSString* imageUrl = image.url;
+            [cell.productImage sd_setImageWithURL:[NSURL URLWithString:imageUrl]];
+        }
+
+        
+    }
     
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void)loadTrackedItems{
+    NSString *requestPath = @"/api/Products";
+    NSString *bearerToken = @"fDb478CPvt_MC5wd5DnlqORDCn6QxgSeezKAw2n7megh6qOTWP-BF9r2RYTXKMqeQTaViPvrYxROwq0SZUd50X9f-mRwCfNrK77YSSOgmxvKoZn6tETpxl9FieGw01rykp6tWEMdN-g9VL8ypIF_7tB9ViuWecltq_-FQzq0Ur4hN26DQpNXlnkpWV1Lr_ivHeelSqIYQFCsfgG0n0dVf8X0eGYURipeWrxC-0_H9CPsL0adya2d-ovHL5Ffs3nzvg5LMIQEkkti8rCKAq6vOTkUuUqWEJYtP3M_5Ja86iia5x5MpMduywKrwP15dvli8sD0dFlsfH9zB-WpyqdBIVd_G0QMcS-8cg07IGTuxDGngUeeC1GyCXi6MW--qeIQ7nh81dIlU_IT8e8zcKZC8oaSxNuevN5UVSWVKkWif1FjQf79AtAEbJah497dZhHkgHRbreZFt-08LjH4GlXlbngevlMLjUv7ND_a5s1-fLO5jiXUYYMnw-I1_0uImwsn";
+    
+    RKObjectManager *objectManager = [RKObjectManager sharedManager];
+    [objectManager.HTTPClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", bearerToken]];
+    
+    [objectManager getObjectsAtPath:requestPath parameters:nil
+                            success: ^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+                                [self fetchTrackedItemsFromContext];
+                            }
+                            failure: ^(RKObjectRequestOperation *operation, NSError *error) {
+                                RKLogError(@"Load failed with error: %@", error);
+                            }];
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (void)fetchTrackedItemsFromContext {
+    NSManagedObjectContext *context = [RKManagedObjectStore defaultStore].mainQueueManagedObjectContext;
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Product"];
+    
+    NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"productId" ascending:YES];
+    fetchRequest.sortDescriptors = @[descriptor];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
+    
+    self.products = fetchedObjects;
+    
+    [self.tableView reloadData];
 }
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 /*
 #pragma mark - Navigation

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1510" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Product" representedClassName="Product" syncable="YES">
+        <attribute name="displayName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="productId" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <relationship name="productCodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProductCode" inverseName="product" inverseEntity="ProductCode" syncable="YES"/>
+        <relationship name="productImages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProductImage" inverseName="product" inverseEntity="ProductImage" syncable="YES"/>
+        <relationship name="productPrices" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProductPrice" inverseName="product" inverseEntity="ProductPrice" syncable="YES"/>
+    </entity>
+    <entity name="ProductCode" representedClassName="ProductCode" syncable="YES">
+        <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="codeId" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="productId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="typeId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="productCodes" inverseEntity="Product" syncable="YES"/>
+    </entity>
+    <entity name="ProductImage" representedClassName="ProductImage" syncable="YES">
+        <attribute name="imageId" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="productId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="productImages" inverseEntity="Product" syncable="YES"/>
+    </entity>
+    <entity name="ProductPrice" representedClassName="ProductPrice" syncable="YES">
+        <attribute name="gathered" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="locationUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="Decimal" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="priceId" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="productId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="sellerId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="productPrices" inverseEntity="Product" syncable="YES"/>
+        <relationship name="seller" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Seller" inverseName="prices" inverseEntity="Seller" syncable="YES"/>
+    </entity>
+    <entity name="Seller" representedClassName="Seller" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sellerId" attributeType="Integer 32" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="website" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="prices" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProductPrice" inverseName="seller" inverseEntity="ProductPrice" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Product" positionX="-324" positionY="-18" width="128" height="118"/>
+        <element name="ProductImage" positionX="-54" positionY="9" width="128" height="103"/>
+        <element name="ProductPrice" positionX="-171" positionY="27" width="128" height="163"/>
+        <element name="ProductCode" positionX="-162" positionY="36" width="128" height="133"/>
+        <element name="Seller" positionX="-153" positionY="81" width="128" height="103"/>
+    </elements>
+</model>
