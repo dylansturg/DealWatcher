@@ -9,7 +9,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.OData;
+using System.Web.Http.OData.Query;
 using AutoMapper;
+using DealWatcher.Filters;
 using DealWatcher.Models;
 using Microsoft.AspNet.Identity;
 
@@ -22,6 +25,7 @@ namespace DealWatcher.Controllers
         private DealWatcherService_dbEntities db = new DealWatcherService_dbEntities();
 
         // GET: api/TrackedProducts
+        [EnableRestrictedQuery]
         [ResponseType(typeof(IEnumerable<ProductViewModel>))]
         public async Task<IHttpActionResult> GetTrackedProducts()
         {
