@@ -7,17 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
-
 namespace DealWatcher.Models
 {
+    using System;
+    using System.Collections.Generic;
+    
     public partial class TrackedProduct
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public int ProductId { get; set; }
-        public DateTimeOffset StartedTracking { get; set; }
-        public Nullable<DateTimeOffset> StoppedTracking { get; set; }
+        public System.DateTimeOffset StartedTracking { get; set; }
+        public Nullable<System.DateTimeOffset> StoppedTracking { get; set; }
     
         public virtual Product Product { get; set; }
         public virtual User User { get; set; }

@@ -20,7 +20,7 @@ namespace DealWatcher.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", false)
+            : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
         

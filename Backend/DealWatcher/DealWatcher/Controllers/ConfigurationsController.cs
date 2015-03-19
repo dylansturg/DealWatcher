@@ -46,11 +46,11 @@ namespace DealWatcher.Controllers
             try
             {
                 var config = RemoteConfigurationManager.Configuration.FetchConfig(key);
-                return Ok(new ConfigurationViewModel
+                return Ok(new ConfigurationViewModel()
                 {
                     Key = key,
                     Value = config,
-                    Type = config.GetType().Name
+                    Type = config.GetType().Name,
                 });
             }
             catch (InvalidConfigurationException)
@@ -74,7 +74,7 @@ namespace DealWatcher.Controllers
             {
                 Key = configuration.Key,
                 Value = savedConfig,
-                Type = savedConfig.GetType().Name
+                Type = savedConfig.GetType().Name,
             });
         }
 

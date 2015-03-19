@@ -9,6 +9,9 @@
 
 namespace DealWatcher.Models
 {
+    using System;
+    using System.Collections.Generic;
+    
     public partial class ProductImage
     {
         public int Id { get; set; }

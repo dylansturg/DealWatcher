@@ -1,4 +1,8 @@
-﻿using System.Web.Http.OData;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Http.OData;
 using System.Web.Http.OData.Query;
 
 namespace DealWatcher.Filters

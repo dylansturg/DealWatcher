@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using DealWatcher.Models;
 using DealWatcher.Models.Amazon;
+using System.Xml.Serialization;
+using System.IO;
+using System.Text;
+using System.Linq;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {
@@ -70,7 +70,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
                         UPCs = item.ItemAttributes.UPCList != null ? new HashSet<string>(item.ItemAttributes.UPCList.UPCListElement.Select(el => el.Value)) : new HashSet<string>(),
                         Title = item.ItemAttributes.Title.Value,
                         ImageUrls = SelectItemImage(item),
-                        Price = SelectItemPrice(item)
+                        Price = SelectItemPrice(item),
                     };
                 }
                 catch (Exception e)

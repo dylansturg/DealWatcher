@@ -236,9 +236,9 @@ namespace DealWatcher.Areas.HelpPage
 
         private static HelpPageApiModel GenerateApiModel(ApiDescription apiDescription, HttpConfiguration config)
         {
-            HelpPageApiModel apiModel = new HelpPageApiModel
+            HelpPageApiModel apiModel = new HelpPageApiModel()
             {
-                ApiDescription = apiDescription
+                ApiDescription = apiDescription,
             };
 
             ModelDescriptionGenerator modelGenerator = config.GetModelDescriptionGenerator();
@@ -304,13 +304,13 @@ namespace DealWatcher.Areas.HelpPage
 
                         if (!parameterDescriptor.IsOptional)
                         {
-                            uriParameter.Annotations.Add(new ParameterAnnotation { Documentation = "Required" });
+                            uriParameter.Annotations.Add(new ParameterAnnotation() { Documentation = "Required" });
                         }
 
                         object defaultValue = parameterDescriptor.DefaultValue;
                         if (defaultValue != null)
                         {
-                            uriParameter.Annotations.Add(new ParameterAnnotation { Documentation = "Default value is " + Convert.ToString(defaultValue, CultureInfo.InvariantCulture) });
+                            uriParameter.Annotations.Add(new ParameterAnnotation() { Documentation = "Default value is " + Convert.ToString(defaultValue, CultureInfo.InvariantCulture) });
                         }
                     }
                     else
@@ -344,7 +344,7 @@ namespace DealWatcher.Areas.HelpPage
             {
                 Name = apiParameter.Name,
                 Documentation = apiParameter.Documentation,
-                TypeDescription = typeDescription
+                TypeDescription = typeDescription,
             };
 
             apiModel.UriParameters.Add(parameterDescription);

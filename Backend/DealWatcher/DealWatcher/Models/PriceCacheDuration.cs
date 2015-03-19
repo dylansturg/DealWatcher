@@ -7,14 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
-
 namespace DealWatcher.Models
 {
+    using System;
+    using System.Collections.Generic;
+    
     public partial class PriceCacheDuration
     {
         public int SellerId { get; set; }
-        public TimeSpan CacheLifetme { get; set; }
+        public System.TimeSpan CacheLifetme { get; set; }
     
         public virtual Seller Seller { get; set; }
     }

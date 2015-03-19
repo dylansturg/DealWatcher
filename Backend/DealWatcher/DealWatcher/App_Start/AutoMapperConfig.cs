@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
-using DealWatcher.ConfigurationManagement;
+﻿using AutoMapper;
 using DealWatcher.Models;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using DealWatcher.ConfigurationManagement;
 
 namespace DealWatcher
 {

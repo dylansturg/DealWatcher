@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using DealWatcher.Models;
-using Configuration = DealWatcher.Models.Configuration;
 
 namespace DealWatcher.ConfigurationManagement
 {
@@ -24,10 +23,10 @@ namespace DealWatcher.ConfigurationManagement
             }
         }
 
-        private static readonly IDictionary<Type, Type> _typesToConvert = new Dictionary<Type, Type>
+        private static readonly IDictionary<Type, Type> _typesToConvert = new Dictionary<Type, Type>()
         {
             {typeof(Int64), typeof(Int32)},
-            {typeof(Int16), typeof(Int32)}
+            {typeof(Int16), typeof(Int32)},
         };
 
         private static RemoteConfigurationManager _instance;
@@ -38,8 +37,8 @@ namespace DealWatcher.ConfigurationManagement
 
         private readonly DealWatcherService_dbEntities _entities;
         private DateTime _lastConfigRefresh = DateTime.UtcNow;
-        private IEnumerable<Configuration> _configurations;
-        private IEnumerable<Configuration> Configurations
+        private IEnumerable<Models.Configuration> _configurations;
+        private IEnumerable<Models.Configuration> Configurations
         {
             get
             {
@@ -57,7 +56,7 @@ namespace DealWatcher.ConfigurationManagement
             }
         }
 
-        private IEnumerable<ConfigurationValueType> _configurationTypes;
+        private IEnumerable<Models.ConfigurationValueType> _configurationTypes;
 
         private RemoteConfigurationManager(DealWatcherService_dbEntities entities)
         {
@@ -127,9 +126,9 @@ namespace DealWatcher.ConfigurationManagement
             var config = QueryConfig(key);
             if (config == null)
             {
-                config = new Configuration
+                config = new Models.Configuration()
                 {
-                    Key = key
+                    Key = key,
                 };
                 _entities.Configurations.Add(config);
             }
@@ -169,7 +168,7 @@ namespace DealWatcher.ConfigurationManagement
             RefreshConfigurations();
         }
 
-        private Configuration QueryConfig(String key)
+        private Models.Configuration QueryConfig(String key)
         {
             return Configurations.FirstOrDefault(c => c.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase));
         }

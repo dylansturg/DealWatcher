@@ -27,7 +27,7 @@ namespace DealWatcher.Filters
                 {
                     var uri = new UriBuilder(request.RequestUri);
                     uri.Scheme = Uri.UriSchemeHttps;
-                    uri.Port = Port;
+                    uri.Port = this.Port;
 
                     response.StatusCode = HttpStatusCode.Found;
                     response.Headers.Location = uri.Uri;

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DealWatcher.Models;
 using DealWatcher.ProductSearch.ProductSource.Amazon;
+using RefactorThis.GraphDiff;
 using WebGrease.Css.Extensions;
 
 namespace DealWatcher.ProductSearch.ProductSource
@@ -56,10 +58,10 @@ namespace DealWatcher.ProductSearch.ProductSource
                 return existingProduct.First();
             }
 
-            var product = new Product
+            var product = new Product()
             {
                 DisplayName = amazonProduct.Title.Length <= DisplayNameLength ?
-                    amazonProduct.Title : amazonProduct.Title.Substring(0, DisplayNameLength - 3) + "..."
+                    amazonProduct.Title : amazonProduct.Title.Substring(0, DisplayNameLength - 3) + "...",
             };
             return product;
         }
@@ -95,12 +97,12 @@ namespace DealWatcher.ProductSearch.ProductSource
                             productCode.Value));
                 }
 
-                var createdProductCode = new ProductCode
+                var createdProductCode = new ProductCode()
                 {
                     Code = productCode.Key,
                     ProductCodeType = codeType,
                     Product = baseProduct,
-                    TypeId = codeType.Id
+                    TypeId = codeType.Id,
                 };
                 baseProduct.ProductCodes.Add(createdProductCode);
             }
@@ -129,7 +131,7 @@ namespace DealWatcher.ProductSearch.ProductSource
                 return;
             }
 
-            var foundPrice = new ProductPrice
+            var foundPrice = new ProductPrice()
             {
                 Current = true,
                 Gathered = DateTime.Now,
@@ -153,10 +155,10 @@ namespace DealWatcher.ProductSearch.ProductSource
             var existingImages = baseProduct.ProductImages.ToList();
             foreach (var image in amazonProduct.ImageUrls.Where(image => existingImages.All(prodImg => prodImg.Url != image)))
             {
-                baseProduct.ProductImages.Add(new ProductImage
+                baseProduct.ProductImages.Add(new ProductImage()
                 {
                     Product = baseProduct,
-                    Url = image
+                    Url = image,
                 });
             }
         }

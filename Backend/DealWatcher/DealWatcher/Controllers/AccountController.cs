@@ -104,7 +104,7 @@ namespace DealWatcher.Controllers
                 logins.Add(new UserLoginInfoViewModel
                 {
                     LoginProvider = LocalLoginProvider,
-                    ProviderKey = user.UserName
+                    ProviderKey = user.UserName,
                 });
             }
 
@@ -310,7 +310,8 @@ namespace DealWatcher.Controllers
                         provider = description.AuthenticationType,
                         response_type = "token",
                         client_id = Startup.PublicClientId,
-                        redirect_uri = new Uri(Request.RequestUri, returnUrl).AbsoluteUri, state
+                        redirect_uri = new Uri(Request.RequestUri, returnUrl).AbsoluteUri,
+                        state = state
                     }),
                     State = state
                 };
@@ -336,7 +337,7 @@ namespace DealWatcher.Controllers
                 return Unauthorized(new List<AuthenticationHeaderValue>());
             }
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -345,7 +346,7 @@ namespace DealWatcher.Controllers
                 return GetErrorResult(result);
             }
 
-            var localUser = new User { AspNetUserId = user.Id, DisplayName = model.DisplayName, FirstName = model.FirstName, LastName = model.LastName };
+            var localUser = new User() { AspNetUserId = user.Id, DisplayName = model.DisplayName, FirstName = model.FirstName, LastName = model.LastName };
             db.Users.Add(localUser);
             await db.SaveChangesAsync();
 
@@ -369,7 +370,7 @@ namespace DealWatcher.Controllers
                 return InternalServerError();
             }
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user);
             if (!result.Succeeded)

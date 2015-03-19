@@ -7,16 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
-
 namespace DealWatcher.Models
 {
+    using System;
+    using System.Collections.Generic;
+    
     public partial class ProductPrice
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
         public int SellerId { get; set; }
-        public DateTimeOffset Gathered { get; set; }
+        public System.DateTimeOffset Gathered { get; set; }
         public string LocationUrl { get; set; }
         public decimal Price { get; set; }
         public bool Current { get; set; }
