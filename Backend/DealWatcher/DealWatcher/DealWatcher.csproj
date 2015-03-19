@@ -259,6 +259,7 @@
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\ProductSearchController.cs" />
     <Compile Include="Controllers\SellersController.cs" />
+    <Compile Include="Controllers\TrackedProductsController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Filters\RequiredWhenOtherPresentAttribute.cs" />
     <Compile Include="Filters\RequireHttpsAttribute.cs" />
@@ -308,9 +309,6 @@
     </Compile>
     <Compile Include="Models\ConfigurationModels.cs" />
     <Compile Include="Models\ConfigurationValueType.cs">
-      <DependentUpon>DealWatcherModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\C__MigrationHistory.cs">
       <DependentUpon>DealWatcherModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DealWatcherModel.Context.cs">

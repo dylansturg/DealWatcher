@@ -75,7 +75,7 @@ namespace DealWatcher.ProductSearch
         {
             var seller = ProductSeller(entities);
             var cacheExpiration = entities.PriceCacheDurations.FirstOrDefault(p => p.SellerId == seller.Id);
-            return cacheExpiration != null ? cacheExpiration.CacheLifetime : DefaultPriceCacheDuration;
+            return cacheExpiration != null ? cacheExpiration.CacheLifetme : DefaultPriceCacheDuration;
         }
 
         protected abstract ProductCodeType SellersProductCodeType(DealWatcherService_dbEntities entities);
