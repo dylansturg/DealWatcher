@@ -11,7 +11,7 @@ namespace DealWatcher.ProductSearch
 {
     public class ProductSearchService
     {
-        protected static IEnumerable<ProductSourceBase> ProductSources = new List<ProductSourceBase>()
+        protected static IEnumerable<ProductSourceBase> ProductSources = new List<ProductSourceBase>
         {
             new AmazonProductSource()
         };
@@ -24,7 +24,7 @@ namespace DealWatcher.ProductSearch
                 : null;
 
             var searchResults = new ConcurrentBag<Product>();
-            var searchTasks = ProductSources.Select<ProductSourceBase, Task>(productSource => TaskEx.Run(async () =>
+            var searchTasks = ProductSources.Select(productSource => TaskEx.Run(async () =>
             {
                 var products = await productSource.SearchAsync(entities, searchModel); 
                 products.ForEach(prod => searchResults.Add(prod));

@@ -17,7 +17,7 @@
                         <p>@parameter.Documentation</p>
                     </td>
                     <td class="parameter-type">
-                        @Html.DisplayFor(m => modelDescription.ModelType, "ModelDescriptionLink", new { modelDescription = modelDescription })
+                        @Html.DisplayFor(m => modelDescription.ModelType, "ModelDescriptionLink", new {modelDescription })
                     </td>
                     <td class="parameter-annotations">
                         @if (parameter.Annotations.Count > 0)

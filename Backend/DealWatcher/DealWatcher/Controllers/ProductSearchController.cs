@@ -1,17 +1,11 @@
-﻿using DealWatcher.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
-using DealWatcher.ProductSearch;
-using AutoMapper;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
-using System.Text;
 using System.Web.Http.Description;
+using System.Web.Http.Results;
+using AutoMapper;
+using DealWatcher.Models;
+using DealWatcher.ProductSearch;
 
 namespace DealWatcher.Controllers
 {
@@ -30,7 +24,7 @@ namespace DealWatcher.Controllers
                 return Ok(Mapper.Map(searchResults, new List<ProductViewModel>()));
             }
 
-            return new System.Web.Http.Results.BadRequestResult(this);
+            return new BadRequestResult(this);
         }
 
         protected override void Dispose(bool disposing)

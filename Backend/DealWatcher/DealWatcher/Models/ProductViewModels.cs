@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+
 namespace DealWatcher.Models
 {
     public class ProductCodeTypesViewModel

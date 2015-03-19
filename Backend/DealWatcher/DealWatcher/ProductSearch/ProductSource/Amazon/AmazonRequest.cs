@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -14,7 +13,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         public enum Operation
         {
             ItemLookup,
-            ItemSearch,
+            ItemSearch
         }
 
         private const string AmazonCodeType = "ASIN";
@@ -22,7 +21,7 @@ namespace DealWatcher.ProductSearch.ProductSource.Amazon
         private int MaxItemPages { get; set; }
 
         protected Operation RequestType { get; set; }
-        protected int Page = 0;
+        protected int Page;
 
         protected String ProductCode { get; set; }
         protected String ProductCodeType { get; set; }

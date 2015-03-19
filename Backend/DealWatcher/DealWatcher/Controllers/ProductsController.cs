@@ -41,7 +41,7 @@ namespace DealWatcher.Controllers
         public async Task<IEnumerable<ProductCodeTypesViewModel>> GetProductCodeTypes()
         {
             var availableCodes = await db.ProductCodeTypes.ToListAsync();
-            return availableCodes.Select(code => new ProductCodeTypesViewModel()
+            return availableCodes.Select(code => new ProductCodeTypesViewModel
             {
                 Id = code.Id,
                 Type = code.Type,
@@ -75,10 +75,7 @@ namespace DealWatcher.Controllers
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return StatusCode(HttpStatusCode.NoContent);

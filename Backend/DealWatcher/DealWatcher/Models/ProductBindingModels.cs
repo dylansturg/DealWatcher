@@ -6,7 +6,7 @@ namespace DealWatcher.Models
     {
         public string Keywords { get; set; }
 
-        [RequiredWhenOtherPresentAttribute("ProductCodeTypeId")]
+        [RequiredWhenOtherPresent("ProductCodeTypeId")]
         public string ProductCode { get; set; }
         [RequiredWhenOtherPresent("ProductCode")]
         public int? ProductCodeTypeId { get; set; }

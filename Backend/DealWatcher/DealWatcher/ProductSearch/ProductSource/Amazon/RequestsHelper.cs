@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 
 namespace DealWatcher.ProductSearch.ProductSource.Amazon
 {

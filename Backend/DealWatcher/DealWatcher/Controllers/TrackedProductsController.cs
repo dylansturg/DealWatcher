@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
-using System.Web.Http.OData;
-using System.Web.Http.OData.Query;
 using AutoMapper;
 using DealWatcher.Filters;
 using DealWatcher.Models;
@@ -85,7 +80,7 @@ namespace DealWatcher.Controllers
             {
                 UserId = localUser.Id,
                 ProductId = productId,
-                StartedTracking = DateTimeOffset.UtcNow,
+                StartedTracking = DateTimeOffset.UtcNow
             };
 
             db.TrackedProducts.Add(userTracked);
