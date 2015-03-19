@@ -16,6 +16,8 @@ namespace DealWatcher.Filters
             AllowedLogicalOperators = AllowedLogicalOperators.None;
             AllowedQueryOptions = AllowedQueryOptions.OrderBy | AllowedQueryOptions.Skip | AllowedQueryOptions.Top |
                                   AllowedQueryOptions.Select;
+            PageSize = 50;
+            MaxTop = 50;
         }
     }
 }
